@@ -1,0 +1,187 @@
+diff -Naur openroad-9999_or/src/cts/src/HTreeBuilder.cpp openroad-9999/src/cts/src/HTreeBuilder.cpp
+--- openroad-9999_or/src/cts/src/HTreeBuilder.cpp       2023-04-21 14:06:49.517807229 +0200
++++ openroad-9999/src/cts/src/HTreeBuilder.cpp  2023-04-21 14:29:09.637380968 +0200
+@@ -201,7 +201,7 @@
+   if (topLevelSinks.size() <= min_clustering_sinks_
+       || !(options_->getSinkClustering())) {
+     Box<int> sinkRegionDbu = clock_.computeSinkRegion();
+-    logger_->info(CTS, 23, " Original sink region: {}.", sinkRegionDbu);
++    //logger_->info(CTS, 23, " Original sink region: {}.", sinkRegionDbu);
+
+     sinkRegion_ = sinkRegionDbu.normalize(1.0 / wireSegmentUnit_);
+   } else {
+@@ -218,7 +218,7 @@
+     }
+     sinkRegion_ = clock_.computeSinkRegionClustered(topLevelSinksClustered_);
+   }
+-  logger_->info(CTS, 24, " Normalized sink region: {}.", sinkRegion_);
++  //logger_->info(CTS, 24, " Normalized sink region: {}.", sinkRegion_);
+   logger_->info(CTS, 25, "    Width:  {:.4f}.", sinkRegion_.getWidth());
+   logger_->info(CTS, 26, "    Height: {:.4f}.", sinkRegion_.getHeight());
+ }
+diff -Naur openroad-9999_or/src/drt/src/db/tech/frConstraint.h openroad-9999/src/drt/src/db/tech/frConstraint.h
+--- openroad-9999_or/src/drt/src/db/tech/frConstraint.h 2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/db/tech/frConstraint.h    2023-04-21 14:52:29.356918592 +0200
+@@ -552,7 +552,7 @@
+         numCuts,
+         width,
+         cutDistance,
+-        connection,
++        int(connection),
+         length,
+         distance);
+   }
+@@ -2163,7 +2163,7 @@
+         "{} edgeLength {} includeLShape {} minLength {} exceptNotch {} "
+         "notchLength {} exceptSameNet {} exceptSameMetal {} sameXY {} "
+         "cornerToCorner {}",
+-        cornerType,
++        int(cornerType),
+         sameMask,
+         within,
+         eolWidth,
+diff -Naur openroad-9999_or/src/drt/src/dr/FlexDR.cpp openroad-9999/src/drt/src/dr/FlexDR.cpp
+--- openroad-9999_or/src/drt/src/dr/FlexDR.cpp  2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/dr/FlexDR.cpp     2023-04-21 14:59:11.916792299 +0200
+@@ -610,7 +610,7 @@
+                           "    Completing {}% with {} violations.",
+                           prev_perc,
+                           getDesign()->getTopBlock()->getNumMarkers());
+-                      logger_->report("    {}.", t);
++                     // logger_->report("    {}.", int(t));
+                     }
+                   }
+                 }
+@@ -637,7 +637,7 @@
+               for (int i = 0; i < distWorkerBatches.size(); i++)
+                 sendWorkers(distWorkerBatches.at(i), workersInBatch);
+             }
+-            logger_->report("    Received Batches:{}.", t);
++            //logger_->report("    Received Batches:{}.", t);
+             std::vector<std::pair<int, std::string>> workers;
+             router_->getWorkerResults(workers);
+             {
+@@ -649,7 +649,7 @@
+                                   workers.at(i).second);
+               }
+             }
+-            logger_->report("    Deserialized Batches:{}.", t);
++            //logger_->report("    Deserialized Batches:{}.", t);
+           }
+         }
+       }
+@@ -680,7 +680,7 @@
+         logger_->report("    Completing {}% with {} violations.",
+                         prev_perc,
+                         getDesign()->getTopBlock()->getNumMarkers());
+-        logger_->report("    {}.", t);
++        //logger_->report("    {}.", t);
+       }
+     }
+   }
+diff -Naur openroad-9999_or/src/drt/src/dr/FlexDR_conn.cpp openroad-9999/src/drt/src/dr/FlexDR_conn.cpp
+--- openroad-9999_or/src/drt/src/dr/FlexDR_conn.cpp     2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/dr/FlexDR_conn.cpp        2023-04-21 14:54:54.186868308 +0200
+@@ -1004,8 +1004,8 @@
+       if (ps->isBeginTruncated()
+           && ((currEnd < ps->high() && currEndPs->isEndTruncated())
+               || (currEnd > ps->high() && ps->isEndTruncated()))) {
+-        logger_->warn(
+-            DRT, 6001, "Path segs were not split: {} and {}", *ps, *currEndPs);
++        /*logger_->warn(
++            DRT, 6001, "Path segs were not split: {} and {}", *ps, *currEndPs);*/
+       }
+       hasOverlap = true;
+       // update local variables
+diff -Naur openroad-9999_or/src/drt/src/pa/FlexPA_graphics.cpp openroad-9999/src/drt/src/pa/FlexPA_graphics.cpp
+--- openroad-9999_or/src/drt/src/pa/FlexPA_graphics.cpp 2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/pa/FlexPA_graphics.cpp    2023-04-21 15:04:32.356718780 +0200
+@@ -305,7 +305,7 @@
+     logger_->info(DRT,
+                   292,
+                   "Marker {} at ({}, {}) ({}, {}).",
+-                  marker->getConstraint()->typeId(),
++                  int(marker->getConstraint()->typeId()),
+                   bbox.xMin(),
+                   bbox.yMin(),
+                   bbox.xMax(),
+@@ -349,7 +349,7 @@
+     logger_->info(DRT,
+                   281,
+                   "Marker {} at ({}, {}) ({}, {}).",
+-                  marker->getConstraint()->typeId(),
++                  int(marker->getConstraint()->typeId()),
+                   bbox.xMin(),
+                   bbox.yMin(),
+                   bbox.xMax(),
+diff -Naur openroad-9999_or/src/grt/src/fastroute/src/utility.cpp openroad-9999/src/grt/src/fastroute/src/utility.cpp
+--- openroad-9999_or/src/grt/src/fastroute/src/utility.cpp      2023-04-21 14:06:49.637807168 +0200
++++ openroad-9999/src/grt/src/fastroute/src/utility.cpp 2023-04-21 14:21:46.027519928 +0200
+@@ -1431,7 +1431,7 @@
+                   edge.n2,
+                   nodes[edge.n2].x,
+                   nodes[edge.n2].y,
+-                  edge.route.type);
++                  int(edge.route.type));
+   if (edge.len > 0) {
+     std::string edge_rpt;
+     for (int i = 0; i <= edge.route.routelen; i++) {
+diff -Naur openroad-9999_or/src/dst/src/BalancerConnection.cc openroad-9999/src/dst/src/BalancerConnection.cc
+--- openroad-9999_or/src/dst/src/BalancerConnection.cc  2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/dst/src/BalancerConnection.cc     2023-04-21 14:33:16.107305933 +0200
+@@ -133,13 +133,13 @@
+                   failure = false;
+                   break;
+                 }
+-                logger_->warn(utl::DST,
++                /*logger_->warn(utl::DST,
+                               204,
+                               "Exception thrown: {}. worker with ip \"{}\" and "
+                               "port \"{}\" will be pushed back the queue.",
+                               ex.what(),
+                               workerAddress,
+-                              port);
++                              port);*/
+                 owner_->punishWorker(workerAddress, port);
+                 failed_workers_trials++;
+                 if (failed_workers_trials == MAX_FAILED_WORKERS_TRIALS) {
+diff -Naur openroad-9999_or/src/dst/src/LoadBalancer.cc openroad-9999/src/dst/src/LoadBalancer.cc
+--- openroad-9999_or/src/dst/src/LoadBalancer.cc        2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/dst/src/LoadBalancer.cc   2023-04-21 14:32:36.557316577 +0200
+@@ -43,11 +43,11 @@
+     logger_->info(utl::DST, 7, "Processed {} jobs", jobs_);
+     auto copy = workers_;
+     while (!copy.empty()) {
+-      auto worker = copy.top();
++      /*auto worker = copy.top();
+       logger_->report("Worker {}/{} handled {} jobs",
+                       worker.ip,
+                       worker.port,
+-                      worker.priority);
++                      worker.priority);*/
+       copy.pop();
+     }
+   }
+diff -Naur openroad-9999_or/src/dbSta/src/dbReadVerilog.cc openroad-9999/src/dbSta/src/dbReadVerilog.cc
+--- openroad-9999_or/src/dbSta/src/dbReadVerilog.cc     2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dbSta/src/dbReadVerilog.cc        2023-04-21 15:45:45.655855300 +0200
+@@ -118,7 +118,7 @@
+ void
+ initDbVerilogNetwork(ord::OpenRoad* openroad)
+ {
+-  openroad->getVerilogNetwork()->init(openroad->getDbNetwork());
++//  openroad->getVerilogNetwork()->init(openroad->getDbNetwork());
+ }
+
+ void
+diff -Naur openroad-9999_or/src/sta/power/Vcd.hh openroad-9999/src/sta/power/Vcd.hh
+--- openroad-9999_or/src/sta/power/Vcd.hh       2023-05-15 00:07:10.449868297 +0200
++++ openroad-9999/src/sta/power/Vcd.hh  2023-05-15 00:07:37.216534307 +0200
+@@ -20,6 +20,7 @@
+ #include <vector>
+ #include <map>
+ #include <algorithm>
++#include <cstdint>
+ 
+ #include "StaState.hh"
+ 

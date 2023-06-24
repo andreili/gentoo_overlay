@@ -1,0 +1,12 @@
+diff -Naur xyce-9999_or/CMakeLists.txt xyce-9999/CMakeLists.txt
+--- xyce-9999_or/CMakeLists.txt 2023-06-24 23:07:37.945271060 +0200
++++ xyce-9999/CMakeLists.txt    2023-06-24 23:07:47.805157816 +0200
+@@ -13,7 +13,7 @@
+ # system and sets up some critical variables.  Therefore, make an initial call
+ # to "project" with "NONE" as the compiler set, then find Trilinos, then set up
+ # the compilers and call project again.
+-project(Xyce NONE)
++project(Xyce CXX)
+ 
+ # Disable Kokkos warning about not supporting C++ extensions
+ set(CMAKE_CXX_EXTENSIONS OFF)

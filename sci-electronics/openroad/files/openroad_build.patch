@@ -1,0 +1,538 @@
+diff -Naur openroad-2.0_or/src/odb/src/defout/CMakeLists.txt openroad-2.0/src/odb/src/defout/CMakeLists.txt
+--- openroad-2.0_or/src/odb/src/defout/CMakeLists.txt   2023-03-23 10:22:03.737758944 +0100
++++ openroad-2.0/src/odb/src/defout/CMakeLists.txt      2023-03-23 10:19:36.508599562 +0100
+@@ -1,4 +1,4 @@
+-add_library(defout
++add_library(defout STATIC
+     defout.cpp
+     defout_impl.cpp
+ )
+diff -Naur openroad-2.0_or/src/odb/src/lefout/CMakeLists.txt openroad-2.0/src/odb/src/lefout/CMakeLists.txt
+--- openroad-2.0_or/src/odb/src/lefout/CMakeLists.txt   2023-03-23 10:22:10.718671670 +0100
++++ openroad-2.0/src/odb/src/lefout/CMakeLists.txt      2023-03-23 10:19:50.669422527 +0100
+@@ -1,4 +1,4 @@
+-add_library(lefout
++add_library(lefout STATIC
+     lefout.cpp
+ )
+
+diff -Naur openroad-2.0_or/src/odb/src/zutil/CMakeLists.txt openroad-2.0/src/odb/src/zutil/CMakeLists.txt
+--- openroad-2.0_or/src/odb/src/zutil/CMakeLists.txt    2023-03-23 10:21:25.659234991 +0100
++++ openroad-2.0/src/odb/src/zutil/CMakeLists.txt       2023-03-23 10:21:34.254127540 +0100
+@@ -1,4 +1,4 @@
+-add_library(zutil
++add_library(zutil STATIC
+     parse.cpp
+     poly_decomp.cpp
+     util.cpp
+--- openroad-9999_or/src/mpl2/CMakeLists.txt    2023-04-21 13:58:49.157986959 +0200
++++ openroad-9999/src/mpl2/CMakeLists.txt       2023-04-21 13:59:17.817978356 +0200
+@@ -93,4 +93,6 @@
+     gui
+ )
+
+-add_subdirectory(test/cpp)
+\ No newline at end of file
++if (ENABLE_TESTS)
++    add_subdirectory(test/cpp)
++endif()
+diff -Naur openroad-9999_or/src/cts/src/HTreeBuilder.cpp openroad-9999/src/cts/src/HTreeBuilder.cpp
+--- openroad-9999_or/src/cts/src/HTreeBuilder.cpp       2023-04-21 14:06:49.517807229 +0200
++++ openroad-9999/src/cts/src/HTreeBuilder.cpp  2023-04-21 14:29:09.637380968 +0200
+@@ -201,7 +201,7 @@
+   if (topLevelSinks.size() <= min_clustering_sinks_
+       || !(options_->getSinkClustering())) {
+     Box<int> sinkRegionDbu = clock_.computeSinkRegion();
+-    logger_->info(CTS, 23, " Original sink region: {}.", sinkRegionDbu);
++    //logger_->info(CTS, 23, " Original sink region: {}.", sinkRegionDbu);
+
+     sinkRegion_ = sinkRegionDbu.normalize(1.0 / wireSegmentUnit_);
+   } else {
+@@ -218,7 +218,7 @@
+     }
+     sinkRegion_ = clock_.computeSinkRegionClustered(topLevelSinksClustered_);
+   }
+-  logger_->info(CTS, 24, " Normalized sink region: {}.", sinkRegion_);
++  //logger_->info(CTS, 24, " Normalized sink region: {}.", sinkRegion_);
+   logger_->info(CTS, 25, "    Width:  {:.4f}.", sinkRegion_.getWidth());
+   logger_->info(CTS, 26, "    Height: {:.4f}.", sinkRegion_.getHeight());
+ }
+diff -Naur openroad-9999_or/src/drt/src/db/tech/frConstraint.h openroad-9999/src/drt/src/db/tech/frConstraint.h
+--- openroad-9999_or/src/drt/src/db/tech/frConstraint.h 2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/db/tech/frConstraint.h    2023-04-21 14:52:29.356918592 +0200
+@@ -552,7 +552,7 @@
+         numCuts,
+         width,
+         cutDistance,
+-        connection,
++        int(connection),
+         length,
+         distance);
+   }
+@@ -2163,7 +2163,7 @@
+         "{} edgeLength {} includeLShape {} minLength {} exceptNotch {} "
+         "notchLength {} exceptSameNet {} exceptSameMetal {} sameXY {} "
+         "cornerToCorner {}",
+-        cornerType,
++        int(cornerType),
+         sameMask,
+         within,
+         eolWidth,
+diff -Naur openroad-9999_or/src/drt/src/dr/FlexDR.cpp openroad-9999/src/drt/src/dr/FlexDR.cpp
+--- openroad-9999_or/src/drt/src/dr/FlexDR.cpp  2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/dr/FlexDR.cpp     2023-04-21 14:59:11.916792299 +0200
+@@ -610,7 +610,7 @@
+                           "    Completing {}% with {} violations.",
+                           prev_perc,
+                           getDesign()->getTopBlock()->getNumMarkers());
+-                      logger_->report("    {}.", t);
++                     // logger_->report("    {}.", int(t));
+                     }
+                   }
+                 }
+@@ -637,7 +637,7 @@
+               for (int i = 0; i < distWorkerBatches.size(); i++)
+                 sendWorkers(distWorkerBatches.at(i), workersInBatch);
+             }
+-            logger_->report("    Received Batches:{}.", t);
++            //logger_->report("    Received Batches:{}.", t);
+             std::vector<std::pair<int, std::string>> workers;
+             router_->getWorkerResults(workers);
+             {
+@@ -649,7 +649,7 @@
+                                   workers.at(i).second);
+               }
+             }
+-            logger_->report("    Deserialized Batches:{}.", t);
++            //logger_->report("    Deserialized Batches:{}.", t);
+           }
+         }
+       }
+@@ -680,7 +680,7 @@
+         logger_->report("    Completing {}% with {} violations.",
+                         prev_perc,
+                         getDesign()->getTopBlock()->getNumMarkers());
+-        logger_->report("    {}.", t);
++        //logger_->report("    {}.", t);
+       }
+     }
+   }
+diff -Naur openroad-9999_or/src/drt/src/dr/FlexDR_conn.cpp openroad-9999/src/drt/src/dr/FlexDR_conn.cpp
+--- openroad-9999_or/src/drt/src/dr/FlexDR_conn.cpp     2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/dr/FlexDR_conn.cpp        2023-04-21 14:54:54.186868308 +0200
+@@ -1004,8 +1004,8 @@
+       if (ps->isBeginTruncated()
+           && ((currEnd < ps->high() && currEndPs->isEndTruncated())
+               || (currEnd > ps->high() && ps->isEndTruncated()))) {
+-        logger_->warn(
+-            DRT, 6001, "Path segs were not split: {} and {}", *ps, *currEndPs);
++        /*logger_->warn(
++            DRT, 6001, "Path segs were not split: {} and {}", *ps, *currEndPs);*/
+       }
+       hasOverlap = true;
+       // update local variables
+diff -Naur openroad-9999_or/src/drt/src/pa/FlexPA_graphics.cpp openroad-9999/src/drt/src/pa/FlexPA_graphics.cpp
+--- openroad-9999_or/src/drt/src/pa/FlexPA_graphics.cpp 2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/drt/src/pa/FlexPA_graphics.cpp    2023-04-21 15:04:32.356718780 +0200
+@@ -305,7 +305,7 @@
+     logger_->info(DRT,
+                   292,
+                   "Marker {} at ({}, {}) ({}, {}).",
+-                  marker->getConstraint()->typeId(),
++                  int(marker->getConstraint()->typeId()),
+                   bbox.xMin(),
+                   bbox.yMin(),
+                   bbox.xMax(),
+@@ -349,7 +349,7 @@
+     logger_->info(DRT,
+                   281,
+                   "Marker {} at ({}, {}) ({}, {}).",
+-                  marker->getConstraint()->typeId(),
++                  int(marker->getConstraint()->typeId()),
+                   bbox.xMin(),
+                   bbox.yMin(),
+                   bbox.xMax(),
+diff -Naur openroad-9999_or/src/grt/src/fastroute/src/utility.cpp openroad-9999/src/grt/src/fastroute/src/utility.cpp
+--- openroad-9999_or/src/grt/src/fastroute/src/utility.cpp      2023-04-21 14:06:49.637807168 +0200
++++ openroad-9999/src/grt/src/fastroute/src/utility.cpp 2023-04-21 14:21:46.027519928 +0200
+@@ -1431,7 +1431,7 @@
+                   edge.n2,
+                   nodes[edge.n2].x,
+                   nodes[edge.n2].y,
+-                  edge.route.type);
++                  int(edge.route.type));
+   if (edge.len > 0) {
+     std::string edge_rpt;
+     for (int i = 0; i <= edge.route.routelen; i++) {
+diff -Naur openroad-9999_or/src/dst/src/BalancerConnection.cc openroad-9999/src/dst/src/BalancerConnection.cc
+--- openroad-9999_or/src/dst/src/BalancerConnection.cc  2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/dst/src/BalancerConnection.cc     2023-04-21 14:33:16.107305933 +0200
+@@ -133,13 +133,13 @@
+                   failure = false;
+                   break;
+                 }
+-                logger_->warn(utl::DST,
++                /*logger_->warn(utl::DST,
+                               204,
+                               "Exception thrown: {}. worker with ip \"{}\" and "
+                               "port \"{}\" will be pushed back the queue.",
+                               ex.what(),
+                               workerAddress,
+-                              port);
++                              port);*/
+                 owner_->punishWorker(workerAddress, port);
+                 failed_workers_trials++;
+                 if (failed_workers_trials == MAX_FAILED_WORKERS_TRIALS) {
+diff -Naur openroad-9999_or/src/dst/src/LoadBalancer.cc openroad-9999/src/dst/src/LoadBalancer.cc
+--- openroad-9999_or/src/dst/src/LoadBalancer.cc        2023-04-21 14:06:49.537807219 +0200
++++ openroad-9999/src/dst/src/LoadBalancer.cc   2023-04-21 14:32:36.557316577 +0200
+@@ -43,11 +43,11 @@
+     logger_->info(utl::DST, 7, "Processed {} jobs", jobs_);
+     auto copy = workers_;
+     while (!copy.empty()) {
+-      auto worker = copy.top();
++      /*auto worker = copy.top();
+       logger_->report("Worker {}/{} handled {} jobs",
+                       worker.ip,
+                       worker.port,
+-                      worker.priority);
++                      worker.priority);*/
+       copy.pop();
+     }
+   }
+diff -Naur openroad-9999_or/src/mpl/src/ParquetFP/src/Annealer.h openroad-9999/src/mpl/src/ParquetFP/src/Annealer.h
+--- openroad-9999_or/src/mpl/src/ParquetFP/src/Annealer.h       2023-03-23 14:05:52.021882291 +0100
++++ openroad-9999/src/mpl/src/ParquetFP/src/Annealer.h  2023-03-23 17:22:11.421619529 +0100
+@@ -63,12 +63,12 @@
+   Annealer() : BaseAnnealer(), _sp(NULL), _spEval(NULL) {}
+
+  public:
+-  Annealer(const Command_Line* const params, DB* const db);
++  Annealer(const Command_Line* const params, DB* const db): BaseAnnealer(),_sp(NULL), _spEval(NULL) {}
+
+-  virtual ~Annealer();
+-  void parseConfig();
++  virtual ~Annealer() {}
++  void parseConfig() {}
+
+-  virtual bool go();
++  virtual bool go() {}
+   void anneal();
+   virtual bool packOneBlock() { return true; }
+
+@@ -76,8 +76,8 @@
+   virtual void compactSoln(bool minWL,
+                            bool fixedOutline,
+                            float reqdH,
+-                           float reqdW);
+-  virtual void takePlfromDB();  // takeSPformDB() + eval()
++                           float reqdW) {}
++  virtual void takePlfromDB() {}  // takeSPformDB() + eval()
+   void takeSPfromDB();          // converts the present pl to a seq-pair
+
+   void eval();        // just evaluate the current SP and set up required
+diff -Naur openroad-9999_or/CMakeLists.txt openroad-9999/CMakeLists.txt
+--- openroad-9999_or/CMakeLists.txt     2023-04-21 15:41:59.615941386 +0200
++++ openroad-9999/CMakeLists.txt        2023-04-21 15:51:13.955748347 +0200
+@@ -60,6 +60,8 @@
+ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+ endif()
+
++get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
++
+ # Allow to use external shared boost libraries
+ option(USE_SYSTEM_BOOST "Use system shared Boost libraries" OFF)
+
+diff -Naur openroad-9999_or/src/dbSta/src/CMakeLists.txt openroad-9999/src/dbSta/src/CMakeLists.txt
+--- openroad-9999_or/src/dbSta/src/CMakeLists.txt       2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dbSta/src/CMakeLists.txt  2023-04-21 17:59:51.078718782 +0200
+@@ -35,7 +35,7 @@
+
+ include("openroad")
+
+-add_library(dbSta_lib
++add_library(dbSta_lib STATIC
+   dbNetwork.cc
+   dbSdcNetwork.cc
+   dbReadVerilog.cc
+diff -Naur openroad-9999_or/src/dbSta/src/dbReadVerilog.cc openroad-9999/src/dbSta/src/dbReadVerilog.cc
+--- openroad-9999_or/src/dbSta/src/dbReadVerilog.cc     2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dbSta/src/dbReadVerilog.cc        2023-04-21 15:45:45.655855300 +0200
+@@ -118,7 +118,7 @@
+ void
+ initDbVerilogNetwork(ord::OpenRoad* openroad)
+ {
+-  openroad->getVerilogNetwork()->init(openroad->getDbNetwork());
++//  openroad->getVerilogNetwork()->init(openroad->getDbNetwork());
+ }
+
+ void
+diff -Naur openroad-9999_or/src/dft/src/architect/CMakeLists.txt openroad-9999/src/dft/src/architect/CMakeLists.txt
+--- openroad-9999_or/src/dft/src/architect/CMakeLists.txt       2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dft/src/architect/CMakeLists.txt  2023-04-21 17:59:38.175234868 +0200
+@@ -1,4 +1,4 @@
+-add_library(dft_architect_lib
++add_library(dft_architect_lib STATIC
+   # Keep sorted
+   ScanArchitect.cpp
+   ScanArchitectHeuristic.cpp
+diff -Naur openroad-9999_or/src/dft/src/cells/CMakeLists.txt openroad-9999/src/dft/src/cells/CMakeLists.txt
+--- openroad-9999_or/src/dft/src/cells/CMakeLists.txt   2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dft/src/cells/CMakeLists.txt      2023-04-21 18:00:01.978830679 +0200
+@@ -1,4 +1,4 @@
+-add_library(dft_cells_lib
++add_library(dft_cells_lib STATIC
+   # Keep sorted
+   OneBitScanCell.cpp
+   ScanCell.cpp
+diff -Naur openroad-9999_or/src/dft/src/clock_domain/CMakeLists.txt openroad-9999/src/dft/src/clock_domain/CMakeLists.txt
+--- openroad-9999_or/src/dft/src/clock_domain/CMakeLists.txt    2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dft/src/clock_domain/CMakeLists.txt       2023-04-21 18:00:11.568867245 +0200
+@@ -1,4 +1,4 @@
+-add_library(dft_clock_domain_lib
++add_library(dft_clock_domain_lib STATIC
+   # Keep sorted
+   ClockDomain.cpp
+ )
+diff -Naur openroad-9999_or/src/dft/src/config/CMakeLists.txt openroad-9999/src/dft/src/config/CMakeLists.txt
+--- openroad-9999_or/src/dft/src/config/CMakeLists.txt  2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dft/src/config/CMakeLists.txt     2023-04-21 18:00:30.119403139 +0200
+@@ -1,4 +1,4 @@
+-add_library(dft_config_lib
++add_library(dft_config_lib STATIC
+   # Keep sorted
+   DftConfig.cpp
+   ScanArchitectConfig.cpp
+diff -Naur openroad-9999_or/src/dft/src/replace/CMakeLists.txt openroad-9999/src/dft/src/replace/CMakeLists.txt
+--- openroad-9999_or/src/dft/src/replace/CMakeLists.txt 2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dft/src/replace/CMakeLists.txt    2023-04-21 18:00:39.759381757 +0200
+@@ -1,4 +1,4 @@
+-add_library(dft_replace_lib
++add_library(dft_replace_lib STATIC
+   # Keep sorted
+   ScanReplace.cpp
+ )
+diff -Naur openroad-9999_or/src/dft/src/utils/CMakeLists.txt openroad-9999/src/dft/src/utils/CMakeLists.txt
+--- openroad-9999_or/src/dft/src/utils/CMakeLists.txt   2023-04-21 15:41:59.365941472 +0200
++++ openroad-9999/src/dft/src/utils/CMakeLists.txt      2023-04-21 18:00:49.507931838 +0200
+@@ -1,5 +1,4 @@
+-
+-add_library(dft_utils_lib
++add_library(dft_utils_lib STATIC
+   # Keep sorted
+   Utils.cpp
+ )
+diff -Naur openroad-9999_or/src/dpl/CMakeLists.txt openroad-9999/src/dpl/CMakeLists.txt
+--- openroad-9999_or/src/dpl/CMakeLists.txt     2023-04-21 15:41:59.375941467 +0200
++++ openroad-9999/src/dpl/CMakeLists.txt        2023-04-21 18:01:03.078139371 +0200
+@@ -39,7 +39,7 @@
+ include("openroad")
+
+
+-add_library(dpl_lib
++add_library(dpl_lib STATIC
+   src/Opendp.cpp
+   src/dbToOpendp.cpp
+   src/Grid.cpp
+diff -Naur openroad-9999_or/src/grt/src/fastroute/CMakeLists.txt openroad-9999/src/grt/src/fastroute/CMakeLists.txt
+--- openroad-9999_or/src/grt/src/fastroute/CMakeLists.txt       2023-04-21 15:41:59.485941428 +0200
++++ openroad-9999/src/grt/src/fastroute/CMakeLists.txt  2023-04-21 18:01:14.338218780 +0200
+@@ -34,7 +34,7 @@
+ ## POSSIBILITY OF SUCH DAMAGE.
+ ################################################################################
+
+-add_library(FastRoute4.1
++add_library(FastRoute4.1 STATIC
+   src/FastRoute.cpp
+   src/RSMT.cpp
+   src/RipUp.cpp
+diff -Naur openroad-9999_or/src/mpl/src/ParquetFP/CMakeLists.txt openroad-9999/src/mpl/src/ParquetFP/CMakeLists.txt
+--- openroad-9999_or/src/mpl/src/ParquetFP/CMakeLists.txt       2023-04-21 15:41:59.485941428 +0200
++++ openroad-9999/src/mpl/src/ParquetFP/CMakeLists.txt  2023-04-21 18:08:10.814536239 +0200
+@@ -36,7 +36,7 @@
+   LANGUAGES CXX
+ )
+
+-add_library(ParquetFP
++add_library(ParquetFP STATIC
+   src/AnalytSolve.cxx
+   src/baseannealer.cxx
+   src/basepacking.cxx
+@@ -74,4 +74,3 @@
+   PUBLIC
+     src
+ )
+-
+diff -Naur openroad-9999_or/src/mpl2/CMakeLists.txt openroad-9999/src/mpl2/CMakeLists.txt
+--- openroad-9999_or/src/mpl2/CMakeLists.txt    2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/mpl2/CMakeLists.txt       2023-04-21 18:02:13.365753142 +0200
+@@ -41,7 +41,7 @@
+
+ find_package(ortools REQUIRED)
+
+-add_library(mpl2_lib
++add_library(mpl2_lib STATIC
+   src/rtl_mp.cpp
+   src/hier_rtlmp.cpp
+   src/object.cpp
+diff -Naur openroad-9999_or/src/odb/CMakeLists.txt openroad-9999/src/odb/CMakeLists.txt
+--- openroad-9999_or/src/odb/CMakeLists.txt     2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/odb/CMakeLists.txt        2023-04-21 18:07:30.576698573 +0200
+@@ -86,4 +86,4 @@
+   target_link_libraries(parseTest
+     odb
+   )
+-endif()
+\ No newline at end of file
++endif()
+diff -Naur openroad-9999_or/src/odb/src/cdl/CMakeLists.txt openroad-9999/src/odb/src/cdl/CMakeLists.txt
+--- openroad-9999_or/src/odb/src/cdl/CMakeLists.txt     2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/odb/src/cdl/CMakeLists.txt        2023-04-21 18:02:43.090025816 +0200
+@@ -1,4 +1,4 @@
+-add_library(cdl
++add_library(cdl STATIC
+     cdl.cpp
+ )
+
+diff -Naur openroad-9999_or/src/odb/src/def/CMakeLists.txt openroad-9999/src/odb/src/def/CMakeLists.txt
+--- openroad-9999_or/src/odb/src/def/CMakeLists.txt     2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/odb/src/def/CMakeLists.txt        2023-04-21 18:02:59.486064599 +0200
+@@ -13,7 +13,7 @@
+              COMPILE_FLAGS "--name-prefix=defyy"
+ )
+
+-add_library(def
++add_library(def STATIC
+   def/defiAlias.cpp
+   def/defiAssertion.cpp
+   def/defiBlockage.cpp
+@@ -50,7 +50,7 @@
+   ${BISON_def_parser_OUTPUT_SOURCE}
+ )
+
+-add_library(defzlib
++add_library(defzlib STATIC
+   defzlib/defzlib.cpp
+ )
+
+diff -Naur openroad-9999_or/src/odb/src/lef/CMakeLists.txt openroad-9999/src/odb/src/lef/CMakeLists.txt
+--- openroad-9999_or/src/odb/src/lef/CMakeLists.txt     2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/odb/src/lef/CMakeLists.txt        2023-04-21 18:03:24.243031853 +0200
+@@ -11,7 +11,7 @@
+ ############################################################
+ # Create a library for LEF
+ ############################################################
+-add_library(lef
++add_library(lef STATIC
+   lef/crypt.cpp
+   lef/lefiArray.cpp
+   lef/lefiCrossTalk.cpp
+@@ -37,7 +37,7 @@
+   ${BISON_lef_parser_OUTPUT_SOURCE}
+ )
+
+-add_library(lefzlib
++add_library(lefzlib STATIC
+   lefzlib/lefzlib.cpp
+ )
+
+diff -Naur openroad-9999_or/src/odb/src/lefin/CMakeLists.txt openroad-9999/src/odb/src/lefin/CMakeLists.txt
+--- openroad-9999_or/src/odb/src/lefin/CMakeLists.txt   2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/odb/src/lefin/CMakeLists.txt      2023-04-21 18:03:35.672994838 +0200
+@@ -1,4 +1,4 @@
+-add_library(lefin
++add_library(lefin STATIC
+     lefin.cpp
+     reader.cpp
+     lefTechLayerSpacingEolParser.cpp
+diff -Naur openroad-9999_or/src/odb/src/swig/common/CMakeLists.txt openroad-9999/src/odb/src/swig/common/CMakeLists.txt
+--- openroad-9999_or/src/odb/src/swig/common/CMakeLists.txt     2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/odb/src/swig/common/CMakeLists.txt        2023-04-21 18:03:46.926574448 +0200
+@@ -1,4 +1,4 @@
+-add_library(odb_swig_common
++add_library(odb_swig_common STATIC
+     swig_common.cpp
+ )
+
+diff -Naur openroad-9999_or/src/odb/src/tm/CMakeLists.txt openroad-9999/src/odb/src/tm/CMakeLists.txt
+--- openroad-9999_or/src/odb/src/tm/CMakeLists.txt      2023-04-21 15:41:59.495941425 +0200
++++ openroad-9999/src/odb/src/tm/CMakeLists.txt 2023-04-21 18:03:57.626194045 +0200
+@@ -1,4 +1,4 @@
+-add_library(tm
++add_library(tm STATIC
+     ZFactory.cpp
+ )
+
+diff -Naur openroad-9999_or/src/par/CMakeLists.txt openroad-9999/src/par/CMakeLists.txt
+--- openroad-9999_or/src/par/CMakeLists.txt     2023-04-21 15:41:59.505941422 +0200
++++ openroad-9999/src/par/CMakeLists.txt        2023-04-21 18:04:16.189408183 +0200
+@@ -37,7 +37,7 @@
+
+ find_package(ortools REQUIRED)
+
+-add_library(par_lib
++add_library(par_lib STATIC
+   src/PartitionMgr.cpp
+   src/TritonPart.cpp
+   src/TPHypergraph.cpp
+diff -Naur openroad-9999_or/src/ppl/src/munkres/CMakeLists.txt openroad-9999/src/ppl/src/munkres/CMakeLists.txt
+--- openroad-9999_or/src/ppl/src/munkres/CMakeLists.txt 2023-04-21 15:41:59.515941419 +0200
++++ openroad-9999/src/ppl/src/munkres/CMakeLists.txt    2023-04-21 18:04:25.519277232 +0200
+@@ -1,6 +1,6 @@
+ project(Munkres)
+
+-add_library(Munkres
++add_library(Munkres STATIC
+   src/Hungarian.cpp
+ )
+
+@@ -8,4 +8,3 @@
+   PUBLIC
+     src
+ )
+-
+diff -Naur openroad-9999_or/src/rcx/src/CMakeLists.txt openroad-9999/src/rcx/src/CMakeLists.txt
+--- openroad-9999_or/src/rcx/src/CMakeLists.txt 2023-04-21 15:41:59.525941416 +0200
++++ openroad-9999/src/rcx/src/CMakeLists.txt    2023-04-21 18:04:34.589210494 +0200
+@@ -33,7 +33,7 @@
+
+ include("openroad")
+
+-add_library(rcx_lib
++add_library(rcx_lib STATIC
+   ext.cpp
+   extBench.cpp
+   extBenchDB.cpp
+diff -Naur openroad-9999_or/src/odb/src/db/CMakeLists.txt openroad-9999/src/odb/src/db/CMakeLists.txt
+--- openroad-9999_or/src/odb/src/db/CMakeLists.txt      2023-04-21 18:31:25.848987915 +0200
++++ openroad-9999/src/odb/src/db/CMakeLists.txt 2023-04-21 18:31:45.894498140 +0200
+@@ -1,4 +1,4 @@
+-add_library(db
++add_library(db STATIC
+     dbBTerm.cpp
+     dbStream.cpp
+     dbBTermItr.cpp
+diff -Naur openroad-9999_or/src/sta/CMakeLists.txt openroad-9999/src/sta/CMakeLists.txt
+--- openroad-9999_or/src/sta/CMakeLists.txt     2023-04-21 18:31:25.908987528 +0200
++++ openroad-9999/src/sta/CMakeLists.txt        2023-04-21 18:32:18.699014507 +0200
+@@ -473,7 +473,7 @@
+ # compatibility with configure
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${STA_HOME}/app)
+
+-add_library(OpenSTA)
++add_library(OpenSTA STATIC)
+
+ target_sources(OpenSTA
+   PRIVATE
+@@ -564,10 +564,10 @@
+ install(TARGETS sta DESTINATION bin)
+
+ # library
+-install(TARGETS OpenSTA DESTINATION lib)
++#install(TARGETS OpenSTA DESTINATION lib)
+
+ # include
+-install(DIRECTORY include/sta  DESTINATION include)
++#install(DIRECTORY include/sta  DESTINATION include)
+
+ ################################################################

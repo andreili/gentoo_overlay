@@ -1,0 +1,48 @@
+diff -Naur Trilinos-trilinos-release-13-4-1_or/packages/amesos/src/Amesos_CSparse.cpp Trilinos-trilinos-release-13-4-1/packages/amesos/src/Amesos_CSparse.cpp
+--- Trilinos-trilinos-release-13-4-1_or/packages/amesos/src/Amesos_CSparse.cpp  2023-05-14 12:45:09.733199042 +0200
++++ Trilinos-trilinos-release-13-4-1/packages/amesos/src/Amesos_CSparse.cpp     2023-05-14 12:45:57.463182638 +0200
+@@ -26,7 +26,7 @@
+ // ***********************************************************************
+ // @HEADER
+
+-#ifdef HAVE_AMESOS_CSPARSE
++//#ifdef HAVE_AMESOS_CSPARSE
+ #include "Amesos_CSparse.h"
+ #include "Epetra_Map.h"
+ #include "Epetra_Import.h"
+@@ -134,8 +134,8 @@
+
+   if (Comm().MyPID() == 0)
+   {
+-    csMatrix.p = (ptrdiff_t *) malloc((SerialMatrix().NumMyRows()+1)*sizeof(ptrdiff_t));
+-    csMatrix.i = (ptrdiff_t *) malloc(SerialMatrix().NumMyNonzeros()*sizeof(ptrdiff_t));
++    csMatrix.p = (int*)(ptrdiff_t *) malloc((SerialMatrix().NumMyRows()+1)*sizeof(ptrdiff_t));
++    csMatrix.i = (int*)(ptrdiff_t *) malloc(SerialMatrix().NumMyNonzeros()*sizeof(ptrdiff_t));
+     csMatrix.x = (double *) malloc(SerialMatrix().NumMyNonzeros()*sizeof(double));
+     csMatrix.nzmax = SerialMatrix().NumMyNonzeros();
+     csMatrix.m = SerialMatrix().NumMyRows();
+@@ -525,4 +525,4 @@
+   AMESOS_RETURN(error);
+ }
+
+-#endif
++//#endif
+diff -Naur Trilinos-trilinos-release-13-4-1_or/packages/amesos/src/Amesos_CSparse.h Trilinos-trilinos-release-13-4-1/packages/amesos/src/Amesos_CSparse.h
+--- Trilinos-trilinos-release-13-4-1_or/packages/amesos/src/Amesos_CSparse.h    2023-05-14 12:45:09.733199042 +0200
++++ Trilinos-trilinos-release-13-4-1/packages/amesos/src/Amesos_CSparse.h       2023-05-14 12:45:22.143194802 +0200
+@@ -28,7 +28,7 @@
+
+ #ifndef AMESOS_CSPARSE_H
+ #define AMESOS_CSPARSE_H
+-#ifdef HAVE_AMESOS_CSPARSE
++//#ifdef HAVE_AMESOS_CSPARSE
+
+ #include "Amesos_ConfigDefs.h"
+ #include "Amesos_BaseSolver.h"
+@@ -212,5 +212,5 @@
+
+ };  // class Amesos_CSparse
+
+-#endif
++//#endif
+ #endif // AMESOS_CSPARSE_H
