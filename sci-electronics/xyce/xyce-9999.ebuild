@@ -33,32 +33,8 @@ PATCHES=(
 	"${FILESDIR}"/cuda_fix.patch
 )
 
-#src_prepare() {
-	#./bootstrap
-	#autoheader
-	#libtoolize --force --copy
-	#aclocal -I config
-	#automake --foreign --add-missing --copy
-	#autoconf
-	#autoheader
-#	eapply_user
-#	eautoreconf
-#}
-
 src_configure() {
-	#econf \
-	#	LDFLAGS="-L${PREFIX}/lib64/trilinos ${LDFLAGS}" \
-	#	--enable-fftw \
-	#	--enable-stokhos \
-	#	--enable-amesos2 \
-	#	--enable-mpi \
-	#	--enable-superlu \
-	#	--enable-shylu \
-	#	--enable-curl \
-	#	--disable-amd
-#	./configure --prefix=/usr
 	local mycmakeargs=(
-#		-DCMAKE_INSTALL_PREFIX=/usr
 		-DXyce_PARALLEL_MPI="$(usex openmp)"
 		#-DXyce_VERBOSE_LINEAR=True
 		#-DXyce_DEBUG_CIRCUIT=True
@@ -77,19 +53,12 @@ src_configure() {
 	fi
 	if use cuda; then
 		mycmakeargs+=(
-			-DCMAKE_C_COMPILER=gcc
-			-DCMAKE_CXX_COMPILER=nvcc_wrapper
 			-DCMAKE_CXX_FLAGS:STRING="-allow-unsupported-compiler"
 		)
-		export CXX=nvcc_wrapper
+		export CXX=nvcc_wrapper NVCC_WRAPPER_DEFAULT_COMPILER=${CXX}
 	fi
 	CPPFLAGS="-std=c++14" cmake_src_configure
 }
-
-#src_install() {
-#	eninja install
-#	rm -rf "${D}"/usr/doc
-#}
 
 pkg_preinst() {
     rm -rf "${D}"/usr/doc

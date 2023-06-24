@@ -163,7 +163,7 @@ src_configure() {
 		-DTPL_ENABLE_SuperLU="$(usex superlu)"
 		-DTPL_ENABLE_TAUCS="$(usex taucs)"
 		-DTPL_ENABLE_TBB="$(usex tbb)"
-		#-DTPL_ENABLE_Thrust="$(usex cuda)"
+		-DTPL_ENABLE_Thrust="$(usex cuda)"
 		-DTPL_ENABLE_TVMET="$(usex tvmet)"
 		-DTPL_ENABLE_UMFPACK="$(usex sparse)"
 		-DTPL_ENABLE_X11="$(usex X)"
@@ -195,18 +195,6 @@ src_configure() {
 		-DAmesos2_ENABLE_Basker=ON
 		-DCMAKE_CXX_FLAGS:STRING="-DSHYLU_NODEBASKER"
 	)
-
-	if use cuda; then
-		mycmakeargs+=(
-			-DCMAKE_C_COMPILER=gcc
-			-DCMAKE_CXX_COMPILER=nvcc_wrapper
-			-DKokkos_ENABLE_CUDA=ON
-			-DKokkos_ENABLE_CUDA_LAMBDA=ON
-			-DKokkos_ARCH_TURING75=ON
-			-DCMAKE_CXX_FLAGS:STRING="-allow-unsupported-compiler"
-		)
-		export CXX=nvcc_wrapper
-	fi
 
 	#
 	# Make sure some critical configuration options are always set
@@ -259,7 +247,19 @@ src_configure() {
 	if use openmp; then
 		[ ! -z "${CC}"] && export OMPI_CC="${CC}" MPICH_CC="${CC}" && tc-export OMPI_CC MPICH_CC
 		[ ! -z "${CXX}"] && export OMPI_CXX="${CXX}" MPICH_CXX="${CXX}" && tc-export OMPI_CXX MPICH_CXX
-		#export CC=mpicc CXX=mpicxx && tc-export CC CXX
+		export CC=mpicc CXX=mpicxx && tc-export CC CXX
+	fi
+
+	if use cuda; then
+		mycmakeargs+=(
+			-DCMAKE_C_COMPILER=gcc
+			-DCMAKE_CXX_COMPILER=nvcc_wrapper
+			-DKokkos_ENABLE_CUDA=ON
+			-DKokkos_ENABLE_CUDA_LAMBDA=ON
+			#-DKokkos_ARCH_TURING75=ON
+			#-DCMAKE_CXX_FLAGS:STRING="-allow-unsupported-compiler"
+		)
+		export CXX=nvcc_wrapper NVCC_WRAPPER_DEFAULT_COMPILER=${CXX}
 	fi
 
 	# Trilinos needs a custom build type:
