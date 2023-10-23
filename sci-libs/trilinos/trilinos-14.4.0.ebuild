@@ -58,15 +58,13 @@ RDEPEND="
 	tvmet? ( dev-libs/tvmet )
 	yaml? ( dev-cpp/yaml-cpp:= )
 	zlib? ( sys-libs/zlib )
-	X? ( x11-libs/libX11 )
-	sci-libs/parmetis"
+	X? ( x11-libs/libX11 )"
 DEPEND="${RDEPEND}
 	virtual/pkgconfig"
 
 S="${WORKDIR}/Trilinos-${PN}-release-${MY_PV}"
 
 PATCHES=(
-	"${FILESDIR}"/xyce.patch
 )
 
 pkg_pretend() {
@@ -195,7 +193,7 @@ src_configure() {
 		# Basker solver
 		-DAmesos2_ENABLE_Basker=ON
 		-DCMAKE_CXX_FLAGS:STRING="-DSHYLU_NODEBASKER"
-	)
+        )
 
 	#
 	# Make sure some critical configuration options are always set

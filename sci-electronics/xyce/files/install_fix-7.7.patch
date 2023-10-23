@@ -34,6 +34,7 @@ diff -Naur xyce-9999_or/src/CMakeLists.txt xyce-9999/src/CMakeLists.txt
  install(TARGETS Xyce DESTINATION bin EXPORT XyceTarget)
  
  # Add header files needed by other codes to link against libxyce.*
+
 diff -Naur xyce-9999_or/utils/SimulinkInterface/CMakeLists.txt xyce-9999/utils/SimulinkInterface/CMakeLists.txt
 --- xyce-9999_or/utils/SimulinkInterface/CMakeLists.txt 2023-05-15 12:38:38.211026556 +0200
 +++ xyce-9999/utils/SimulinkInterface/CMakeLists.txt    2023-05-15 12:43:45.132168085 +0200
@@ -46,28 +47,30 @@ diff -Naur xyce-9999_or/utils/SimulinkInterface/CMakeLists.txt xyce-9999/utils/S
    install(FILES XyceBlocks.slx DESTINATION share/simulink)
    
    matlab_add_mex( NAME xyce2nLv_sfunction MODULE  SRC xyce2nLv_sfunction.cpp LINK_TO XyceLib )
+
 diff -Naur xyce-9999_or/utils/XyceCInterface/CMakeLists.txt xyce-9999/utils/XyceCInterface/CMakeLists.txt
 --- xyce-9999_or/utils/XyceCInterface/CMakeLists.txt    2023-05-15 12:38:38.211026556 +0200
 +++ xyce-9999/utils/XyceCInterface/CMakeLists.txt       2023-05-15 12:43:08.092469721 +0200
-@@ -5,7 +5,7 @@
- target_sources( xycecinterface PRIVATE N_CIR_XyceCInterface.C PUBLIC N_CIR_XyceCInterface.h )
- target_include_directories( xycecinterface PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> )
- target_link_libraries(xycecinterface  XyceLib )
--install(TARGETS xycecinterface DESTINATION lib )
-+install(TARGETS xycecinterface DESTINATION ${CMAKE_INSTALL_LIBDIR} )
- install(FILES N_CIR_XyceCInterface.h DESTINATION include)
-
-
+@@ -21,7 +21,7 @@
+ endif()
+ 
+ 
+-install( TARGETS xycecinterface DESTINATION lib OPTIONAL)
++install( TARGETS xycecinterface DESTINATION ${CMAKE_INSTALL_LIBDIR} OPTIONAL)
+ configure_file(xyce_interface.py.cmake xyce_interface.py @ONLY )
+ install( FILES N_CIR_XyceCInterface.h DESTINATION include OPTIONAL)
+ install( FILES ${CMAKE_CURRENT_BINARY_DIR}/xyce_interface.py DESTINATION share OPTIONAL)
 
 diff -Naur xyce-9999_or/src/CMakeLists.txt xyce-9999/src/CMakeLists.txt
 --- xyce-9999_or/src/CMakeLists.txt     2023-05-26 18:32:42.704669936 +0200
 +++ xyce-9999/src/CMakeLists.txt        2023-05-26 18:37:51.203869009 +0200
-@@ -328,10 +328,10 @@
+@@ -318,11 +318,11 @@
  configure_package_config_file(
    cmake/XyceConfig.cmake.in
    ${CMAKE_CURRENT_BINARY_DIR}/cmake/XyceConfig.cmake
 -  INSTALL_DESTINATION lib/cmake
 +  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+   PATH_VARS Xyce_Trilinos_DIR
  )
  
 -set(ConfigPackageLocation lib/cmake/Xyce)
@@ -75,50 +78,3 @@ diff -Naur xyce-9999_or/src/CMakeLists.txt xyce-9999/src/CMakeLists.txt
  install(EXPORT XyceLibTarget
    FILE
      XyceTargets.cmake
-diff -Naur xyce-9999_or/CMakeLists.txt xyce-9999/CMakeLists.txt
---- xyce-9999_or/CMakeLists.txt 2023-06-15 12:10:16.293228331 +0200
-+++ xyce-9999/CMakeLists.txt    2023-06-15 12:35:46.624756996 +0200
-@@ -15,6 +15,9 @@
- # the compilers and call project again.
- project(Xyce NONE)
- 
-+# Disable Kokkos warning about not supporting C++ extensions
-+set(CMAKE_CXX_EXTENSIONS OFF)
-+
- # A TriBITS project that performs a coupled build with Trilinos, like Charon,
- # changes the names of all the Trilinos variables.  Therefore, we have to jump
- # through a bunch of hoops to take that use case into account.  Here we set a
-diff -Naur xyce-9999_or/cmake/tps.cmake xyce-9999/cmake/tps.cmake
---- xyce-9999_or/cmake/tps.cmake        2023-06-15 12:10:16.259895400 +0200
-+++ xyce-9999/cmake/tps.cmake   2023-06-15 12:42:55.076301530 +0200
-@@ -107,8 +107,8 @@
- # Search for required TPL packages
- 
- message(STATUS "Looking for BLAS and LAPACK via Trilinos")
--list(FIND Trilinos_TPL_LIST BLAS BLAS_IN_Trilinos)
--list(FIND Trilinos_TPL_LIST LAPACK LAPACK_IN_Trilinos)
-+list(FIND BLAS::all_libs BLAS BLAS_IN_Trilinos)
-+list(FIND LAPACK::all_libs LAPACK LAPACK_IN_Trilinos)
- if ((BLAS_IN_Trilinos GREATER -1) AND (LAPACK_IN_Trilinos GREATER -1))
-      message(STATUS "Looking for BLAS and LAPACK via Trilinos - found")
- else()
-@@ -117,7 +117,7 @@
-           "Enable the following in the Trilinos build:\n"
-           "  -D TPL_ENABLE_BLAS=ON\n"
-           "  -D TPL_ENABLE_LAPACK=ON")
--     set(Trilinos_IS_MISSING_FEATURES TRUE)
-+#     set(Trilinos_IS_MISSING_FEATURES TRUE)
- endif()
- 
- # Search for required features
-diff -Naur xyce-9999_or/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C xyce-9999/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C
---- xyce-9999_or/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C     2023-06-15 19:12:44.585504630 +0200
-+++ xyce-9999/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C        2023-06-15 19:16:03.513134501 +0200
-@@ -53,6 +53,7 @@
- #include <EpetraExt_Isorropia_CrsGraph.h>
- #endif
- #endif
-+#include <EpetraExt_Isorropia_CrsGraph.h>
- 
- #ifdef Xyce_AMD
- #include <EpetraExt_AMD_CrsGraph.h>

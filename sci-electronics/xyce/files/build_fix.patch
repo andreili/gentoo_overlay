@@ -1,0 +1,25 @@
+diff -Naur xyce-9999_or/CMakeLists.txt xyce-9999/CMakeLists.txt
+--- xyce-9999_or/CMakeLists.txt 2023-06-15 12:10:16.293228331 +0200
++++ xyce-9999/CMakeLists.txt    2023-06-15 12:35:46.624756996 +0200
+@@ -15,6 +15,9 @@
+ # the compilers and call project again.
+ project(Xyce NONE)
+ 
++# Disable Kokkos warning about not supporting C++ extensions
++set(CMAKE_CXX_EXTENSIONS OFF)
++
+ # A TriBITS project that performs a coupled build with Trilinos, like Charon,
+ # changes the names of all the Trilinos variables.  Therefore, we have to jump
+ # through a bunch of hoops to take that use case into account.  Here we set a
+diff -Naur xyce-9999_or/cmake/tps.cmake xyce-9999/cmake/tps.cmake
+diff -Naur xyce-9999_or/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C xyce-9999/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C
+--- xyce-9999_or/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C     2023-06-15 19:12:44.585504630 +0200
++++ xyce-9999/src/LinearAlgebraServicesPKG/N_LAS_TransformTool.C        2023-06-15 19:16:03.513134501 +0200
+@@ -53,6 +53,7 @@
+ #include <EpetraExt_Isorropia_CrsGraph.h>
+ #endif
+ #endif
++#include <EpetraExt_Isorropia_CrsGraph.h>
+ 
+ #ifdef Xyce_AMD
+ #include <EpetraExt_AMD_CrsGraph.h>
