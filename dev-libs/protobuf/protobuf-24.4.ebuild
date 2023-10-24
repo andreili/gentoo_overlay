@@ -35,9 +35,9 @@ RDEPEND="
 	zlib? ( sys-libs/zlib[${MULTILIB_USEDEP}] )
 "
 
-PATCHES=(
-    ${FILESDIR}/protobuf-v24.4.patch
-)
+#PATCHES=(
+#    ${FILESDIR}/protobuf-v24.4.patch
+#)
 
 DOCS=( CONTRIBUTORS.txt README.md )
 
