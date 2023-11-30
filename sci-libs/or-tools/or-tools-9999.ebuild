@@ -11,9 +11,9 @@ if [[ ${PV} == 9999 ]] ; then
 	EGIT_BRANCH="main"
 	inherit git-r3
 
-	PATCHES=(
-		${FILESDIR}/latest_fix.patch
-	)
+	#PATCHES=(
+	#	${FILESDIR}/latest_fix.patch
+	#)
 else
 	SRC_URI="https://github.com/google/${PN}/archive/refs/tags/v${PV}.zip"
 fi

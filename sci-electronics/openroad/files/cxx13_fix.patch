@@ -1,0 +1,11 @@
+diff -Naur openroad-9999_or/include/ord/Design.h openroad-9999/include/ord/Design.h
+--- openroad-9999_or/include/ord/Design.h       2023-10-24 13:18:05.744217313 +0200
++++ openroad-9999/include/ord/Design.h  2023-10-24 13:18:46.593757195 +0200
+@@ -37,6 +37,7 @@
+ 
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ namespace odb {
+ class dbBlock;

@@ -13,6 +13,7 @@ EGIT_SUBMODULES=( '*' )
 
 PATCHES=(
     "${FILESDIR}"/${PN}_build1.patch
+    ${FILESDIR}/cxx13_fix.patch
 )
 
 
@@ -25,7 +26,7 @@ DEPEND="
 	dev-cpp/eigen
 	sci-libs/lemon
 	dev-cpp/gtest
-	dev-cpp/or-tools
+	sci-libs/or-tools
 	dev-lang/swig
 	dev-libs/boost
 "
@@ -39,9 +40,9 @@ BDEPEND="
 src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_INSTALL_PREFIX="${EPREFIX}/usr/"
-#		-DUSE_SYSTEM_ABC=true
+		#-DUSE_SYSTEM_ABC=true
 		-DUSE_SYSTEM_BOOST=true
-		-DCMAKE_CXX_FLAGS="-fPIC -DFMT_DEPRECATED_OSTREAM=1"
+		-DCMAKE_CXX_FLAGS="-DFMT_DEPRECATED_OSTREAM=1"
 		-DCMAKE_BUILD_TYPE="RELEASE"
 		-DBUILD_SHARED_LIBS=NO
 	)

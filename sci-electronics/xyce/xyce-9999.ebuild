@@ -19,13 +19,13 @@ else
 fi
 
 SLOT="0"
-IUSE="cuda openmp"
+IUSE="cuda openmp metis shylu superlu"
 
 DEPEND="
-	sci-libs/fftw
+	openmp? ( sci-libs/fftw[openmp?] )
 	sci-libs/suitesparse
 	virtual/blas
-	sci-libs/trilinos
+	sci-libs/trilinos[sparse(+),metis?,shylu?,superlu?]
 	openmp? ( virtual/mpi[nullmpi(+)] )
 	dev-perl/XML-LibXML
 "
