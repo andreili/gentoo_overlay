@@ -4,7 +4,7 @@
 EAPI=8
 
 CMAKE_MAKEFILE_GENERATOR=emake
-inherit cmake toolchain-funcs
+inherit cmake flag-o-matic toolchain-funcs
 
 DESCRIPTION="Scientific library collection for large scale problems"
 HOMEPAGE="http://trilinos.sandia.gov/"
@@ -19,7 +19,7 @@ SLOT="0"
 IUSE="
 	adolc all-packages arprec clp cuda eigen glpk gtest hdf5 hwloc hypre
 	matio metis mkl mumps netcdf openmp petsc qd scalapack scotch sparse
-	superlu taucs tbb test threads tvmet yaml zlib X
+	superlu taucs tbb test threads tvmet yaml zlib X shylu
 "
 
 # TODO: fix export cmake function for tests
@@ -45,6 +45,7 @@ RDEPEND="
 	matio? ( sci-libs/matio )
 	mkl? ( sci-libs/mkl )
 	metis? ( sci-libs/metis )
+	metis? ( openmp? ( sci-libs/parmetis ) )
 	mumps? ( sci-libs/mumps )
 	netcdf? ( sci-libs/netcdf:= )
 	petsc? ( sci-mathematics/petsc )
@@ -58,15 +59,14 @@ RDEPEND="
 	tvmet? ( dev-libs/tvmet )
 	yaml? ( dev-cpp/yaml-cpp:= )
 	zlib? ( sys-libs/zlib )
-	X? ( x11-libs/libX11 )
-	sci-libs/parmetis"
+	X? ( x11-libs/libX11 )"
 DEPEND="${RDEPEND}
 	virtual/pkgconfig"
 
 S="${WORKDIR}/Trilinos-${PN}-release-${MY_PV}"
 
 PATCHES=(
-	"${FILESDIR}"/xyce.patch
+    "${FILESDIR}/xyce.patch"
 )
 
 pkg_pretend() {
@@ -94,28 +94,21 @@ trilinos_conf() {
 	[[ -n ${dirs} ]] && mycmakeargs+=( "-D${2}_INCLUDE_DIRS=${dirs:1}" )
 }
 
-#
-# The following packages are currently disabled:
-#  - Adelus/Zadelus due to underlinkage.
-#  - Moertel due to underlinkage
-#  - SEACAS is incompatible with netcdf, see
-#    https://github.com/trilinos/Trilinos/tree/master/packages/seacas#netcdf
-#
-
 src_configure() {
+	# Trilinos is a massive C++ project. Fixing all of the lto warnings and
+	# making safe for lto compilation/linking will be a massive
+	# undertaking. Thus, simply filter lto flags. bug #862987
+	filter-lto
+
 	local mycmakeargs=(
 		-DBUILD_SHARED_LIBS=ON
 		-DCMAKE_INSTALL_PREFIX="${EPREFIX}"
+		-DCMAKE_SKIP_RPATH=ON
 		-DCMAKE_SKIP_INSTALL_RPATH=ON
-		-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF
-		-DTrilinos_INSTALL_CONFIG_DIR="${EPREFIX}/usr/$(get_libdir)/cmake"
 		-DTrilinos_INSTALL_INCLUDE_DIR="${EPREFIX}/usr/include/trilinos"
 		-DTrilinos_INSTALL_LIB_DIR="${EPREFIX}/usr/$(get_libdir)/trilinos"
 		-DTrilinos_ENABLE_ALL_PACKAGES="$(usex all-packages)"
-		-DTrilinos_ENABLE_Adelus=OFF
-		-DTrilinos_ENABLE_Moertel=OFF
 		-DTrilinos_ENABLE_PyTrilinos=OFF
-		-DTrilinos_ENABLE_SEACAS=OFF
 		-DTrilinos_ENABLE_Amesos=ON
 		-DTrilinos_ENABLE_AztecOO=ON
 		-DTrilinos_ENABLE_EpetraExt=ON
@@ -179,6 +172,8 @@ src_configure() {
 		-DEpetraExt_BUILD_EXPERIMENTAL=ON
 		-DEpetraExt_BUILD_GRAPH_REORDERINGS=ON
 		-DTeuchos_ENABLE_COMPLEX=ON
+		-DTrilinos_ENABLE_ShyLU="$(usex shylu)"
+		-DTrilinos_ENABLE_ShyLU_NodeTacho="$(usex shylu)"
 		# error fixes
 		-DTrilinos_ENABLE_COMPLEX=ON
 		-DAmesos_ENABLE_CSparse="$(usex sparse)"
@@ -189,13 +184,12 @@ src_configure() {
 		# more solvers
 		#-DKokkos_ENABLE_THREADS="$(usex threads)"
 		#-DTpetra_INST_PTHREAD="$(usex threads)"
-		-DTrilinos_ENABLE_ShyLU_NodeTacho=OFF
 		#
-		-DAmesos_ENABLE_ParMETIS=ON
+		-DAmesos_ENABLE_ParMETIS="$(usex metis)"
 		# Basker solver
 		-DAmesos2_ENABLE_Basker=ON
 		-DCMAKE_CXX_FLAGS:STRING="-DSHYLU_NODEBASKER"
-	)
+        )
 
 	#
 	# Make sure some critical configuration options are always set

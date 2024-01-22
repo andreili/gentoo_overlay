@@ -2,3 +2,8 @@ dev-cpp
 dev-libs
 sci-electronics
 sci-libs
+cross-riscv32-unknown-elf
+cross-x86_64-w64-mingw32
+cross-i686-w64-mingw32
+cross-aarch64-unknown-linux-gnu
+cross-avr
