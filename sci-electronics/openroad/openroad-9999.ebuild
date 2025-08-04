@@ -34,7 +34,7 @@ RDEPEND="
 	${DEPEND}
 "
 BDEPEND="
-	dev-util/cmake
+	dev-build/cmake
 "
 
 src_configure() {
