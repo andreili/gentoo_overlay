@@ -9,9 +9,20 @@ RDEPEND="
 	dev-vcs/git
 	dev-embedded/u-boot-tools
 	sys-apps/dtc
-	cross-aarch64-unknown-linux-gnu/binutils
-	cross-aarch64-unknown-linux-gnu/gcc
-	cross-aarch64-unknown-linux-gnu/glibc
+	dev-python/gitpython
+	dev-python/rich
 	sys-fs/squashfs-tools
-	dev-debug/gdb
+	app-admin/sudo
+	dev-python/pyelftools
+	net-dialup/minicom
+	cross-aarch64-linux-gnu/binutils
+	cross-aarch64-linux-gnu/gcc
+	cross-aarch64-linux-gnu/glibc
+	cross-aarch64-linux-gnu/linux-headers
+	cross-riscv32-unknown-elf/binutils
+	cross-riscv32-unknown-elf/gcc
+	cross-riscv32-unknown-elf/newlib
+	sci-electronics/verilator
+	dev-util/dialog
+	sci-electronics/dsview
 "
