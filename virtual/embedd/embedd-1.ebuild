@@ -15,14 +15,13 @@ RDEPEND="
 	app-admin/sudo
 	dev-python/pyelftools
 	net-dialup/minicom
-	cross-aarch64-linux-gnu/binutils
-	cross-aarch64-linux-gnu/gcc
-	cross-aarch64-linux-gnu/glibc
-	cross-aarch64-linux-gnu/linux-headers
-	cross-riscv32-unknown-elf/binutils
-	cross-riscv32-unknown-elf/gcc
-	cross-riscv32-unknown-elf/newlib
+	cross-aarch64-unknown-linux-gnu/binutils
+	cross-aarch64-unknown-linux-gnu/gcc
+	cross-aarch64-unknown-linux-gnu/glibc
+	cross-aarch64-unknown-linux-gnu/linux-headers
 	sci-electronics/verilator
 	dev-util/dialog
 	sci-electronics/dsview
+	app-emulation/qemu
+	net-fs/autofs
 "
