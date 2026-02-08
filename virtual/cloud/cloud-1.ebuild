@@ -18,4 +18,5 @@ RDEPEND="dev-lang/php[curl?,filter,gd,hash(+),intl,json(+),mysql?,pdo,posix,post
 	dev-php/pdlib
 	app-admin/sudo
 	app-misc/mosquitto
+	www-apps/gitea
 	net-firewall/ufw"
