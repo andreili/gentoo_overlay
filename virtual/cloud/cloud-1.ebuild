@@ -16,4 +16,6 @@ RDEPEND="dev-lang/php[curl?,filter,gd,hash(+),intl,json(+),mysql?,pdo,posix,post
 	media-libs/vips
 	media-libs/exiftool
 	dev-php/pdlib
-	app-admin/sudo"
+	app-admin/sudo
+	app-misc/mosquitto
+	net-firewall/ufw"

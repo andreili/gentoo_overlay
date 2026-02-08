@@ -21,4 +21,16 @@ RDEPEND="
 	sys-apps/usbutils
 	app-mobilephone/dfu-util
 	mainsail? ( www-servers/nginx )
+	media-video/ffmpeg[x264(+),x265(+)]
+	sci-libs/openblas
+	dev-python/matplotlib
+	sys-devel/crossdev
+	sys-apps/pciutils
+	media-libs/libv4l
+	net-misc/ntp
+	dev-python/python-mpv
+	x11-apps/xsetroot
+	x11-apps/xset
+	sys-fs/f2fs-tools
+	sys-apps/i2c-tools
 "
