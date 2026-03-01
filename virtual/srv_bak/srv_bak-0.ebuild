@@ -13,4 +13,5 @@ RDEPEND="net-analyzer/zabbix[agent,-server,-frontend,-mysql]
         sys-fs/mdadm
         sys-apps/smartmontools
         sys-apps/pciutils
+	net-firewall/ufw
 "
