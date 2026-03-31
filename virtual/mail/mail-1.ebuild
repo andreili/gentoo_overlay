@@ -17,5 +17,4 @@ RDEPEND="net-mail/dovecot
 	mail-filter/spamassassin
 	app-antivirus/clamav
 	mail-mta/postfix
-	dev-db/phpmyadmin
-	net-mail/courier-imap"
+	dev-db/phpmyadmin"
