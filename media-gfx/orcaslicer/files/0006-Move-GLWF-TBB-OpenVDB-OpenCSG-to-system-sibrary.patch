@@ -1,0 +1,41 @@
+From a97dc58795f1c896f6382f4fcd8af2e9acbf3fcb Mon Sep 17 00:00:00 2001
+From: Andrey Leonchikov <andreil499@gmail.com>
+Date: Sat, 25 Apr 2026 21:30:25 +0200
+Subject: [PATCH 06/11] Move GLWF/TBB/OpenVDB/OpenCSG to system sibrary.
+
+---
+ CMakeLists.txt                   |   7 +-
+ build.sh                         |   9 +-
+ src/libslic3r/CMakeLists.txt     |   2 +
+ 16 files changed, 16 insertions(+), 1456 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bc374f4251..a2ad314066 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -751,7 +751,8 @@ find_package(NLopt 1.4 REQUIRED)
+     set(USE_BLOSC TRUE)
+ endif ()
+ 
+-find_package(OpenVDB 5.0 COMPONENTS openvdb)
++list(INSERT CMAKE_MODULE_PATH 0 "/usr/lib64/cmake/OpenVDB")
++find_package(OpenVDB 5.0 COMPONENTS openvdb REQUIRED)
+ if(OpenVDB_FOUND)
+     slic3r_remap_configs(IlmBase::Half RelWithDebInfo Release)
+     slic3r_remap_configs(Blosc::blosc RelWithDebInfo Release)
+diff --git a/src/libslic3r/CMakeLists.txt b/src/libslic3r/CMakeLists.txt
+index b2b41bf396..53e4e3a064 100644
+--- a/src/libslic3r/CMakeLists.txt
++++ b/src/libslic3r/CMakeLists.txt
+@@ -548,6 +548,8 @@ find_package(Blosc REQUIRED)
+ find_package(GLEW REQUIRED)
+ find_package(NLopt REQUIRED)
+ find_package(cereal REQUIRED)
++find_package(glfw3 REQUIRED)
++find_package(TBB REQUIRED)
+ 
+ find_library(GMP_LIBRARY NAMES gmp libgmp)
+ find_library(MPFR_LIBRARY NAMES mpfr libmpfr)
+-- 
+2.53.0
+

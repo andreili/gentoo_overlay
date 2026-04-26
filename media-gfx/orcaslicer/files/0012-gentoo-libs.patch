@@ -1,0 +1,103 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 64d042db..1c7e3b2f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -501,6 +501,7 @@ include_directories(SYSTEM ${LIBDIR})
+ include_directories(SYSTEM ${LIBDIR_BIN}/dev-utils/platform)
+ # For ligigl
+ include_directories(SYSTEM ${LIBDIR}/libigl)
++include_directories(SYSTEM /usr/include/hidapi)
+ 
+ if(WIN32)
+     add_definitions(-D_USE_MATH_DEFINES -D_WIN32 -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+diff --git a/deps_src/CMakeLists.txt b/deps_src/CMakeLists.txt
+index 072feed0..4dad677d 100644
+--- a/deps_src/CMakeLists.txt
++++ b/deps_src/CMakeLists.txt
+@@ -7,26 +7,79 @@ project(deps_src)
+ add_subdirectory(agg)
+ add_subdirectory(ankerl)
+ add_subdirectory(earcut)
+-add_subdirectory(fast_float)
+-add_subdirectory(nanosvg)
+-add_subdirectory(nlohmann)
++
++find_package(FastFloat QUIET)
++if(FastFloat_FOUND)
++    message(STATUS "FastFloat found, using system version...")
++else()
++    message(STATUS "FastFloat NOT found, using bundled version...")
++    add_subdirectory(fast_float)
++endif()
++
++find_package(NanoSVG QUIET)
++if(NanoSVG_FOUND)
++    message(STATUS "NanoSVG found, using system version...")
++else()
++    message(STATUS "NanoSVG NOT found, using bundled version...")
++    add_subdirectory(nanosvg)
++endif()
++
++find_package(nlohmann_json QUIET)
++if(nlohmann_json_FOUND)
++    message(STATUS "nlohmann_json found, using system version...")
++else()
++    message(STATUS "nlohmann_json NOT found, using bundled version...")
++    add_subdirectory(nlohmann)
++endif()
++
+ add_subdirectory(stb_dxt)     # Header-only STB DXT compression library
+ 
+ # Static libraries
+ add_subdirectory(Shiny)
+ add_subdirectory(admesh)
+ add_subdirectory(clipper)
+-add_subdirectory(clipper2)
+-add_subdirectory(expat)
++
++find_package(Clipper2 QUIET)
++if(Clipper2_FOUND)
++    message(STATUS "Clipper2 found, using system version...")
++else()
++    message(STATUS "Clipper2 NOT found, using bundled version...")
++    add_subdirectory(clipper2)
++endif()
++
++find_package(expat QUIET)
++if(expat_FOUND)
++    message(STATUS "expat found, using system version...")
++else()
++    message(STATUS "expat NOT found, using bundled version...")
++    add_subdirectory(expat)
++endif()
++
+ add_subdirectory(glu-libtess)
+-add_subdirectory(hidapi)
++
++find_package(hidapi QUIET)
++if(hidapi_FOUND)
++    message(STATUS "hidapi found, using system version...")
++else()
++    message(STATUS "hidapi NOT found, using bundled version...")
++    add_subdirectory(hidapi)
++endif()
++
+ add_subdirectory(hints)        # Hints library with utility executable
+ add_subdirectory(imgui)
+ add_subdirectory(imguizmo)
+ add_subdirectory(libigl)
+ add_subdirectory(libnest2d)
+ add_subdirectory(mcut)
+-add_subdirectory(md4c)
++
++find_package(md4c QUIET)
++if(md4c_FOUND)
++    message(STATUS "md4c found, using system version...")
++else()
++    message(STATUS "md4c NOT found, using bundled version...")
++    add_subdirectory(md4c)
++endif()
++
+ add_subdirectory(miniz)
+ add_subdirectory(minilzo)
+ add_subdirectory(qhull)

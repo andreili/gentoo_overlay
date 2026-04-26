@@ -1,0 +1,200 @@
+From 10505dc6acebb334b6d7ee9e8a96dc4648331748 Mon Sep 17 00:00:00 2001
+From: Andrey Leonchikov <andreil499@gmail.com>
+Date: Sun, 26 Apr 2026 09:00:09 +0200
+Subject: [PATCH 11/11] Disable "Draco files" support.
+
+---
+ src/libslic3r/CMakeLists.txt     |  8 ++++----
+ src/libslic3r/Model.cpp          |  4 ++--
+ src/slic3r/GUI/GUI_App.cpp       |  2 +-
+ src/slic3r/GUI/GUI_Factories.cpp |  4 ++--
+ src/slic3r/GUI/MainFrame.cpp     |  4 ++--
+ src/slic3r/GUI/Plater.cpp        | 18 +++++++++---------
+ 6 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/src/libslic3r/CMakeLists.txt b/src/libslic3r/CMakeLists.txt
+index 6c9dff04c5..14f450a669 100644
+--- a/src/libslic3r/CMakeLists.txt
++++ b/src/libslic3r/CMakeLists.txt
+@@ -183,8 +183,8 @@ set(lisbslic3r_sources
+     Format/3mf.hpp
+     Format/AMF.cpp
+     Format/AMF.hpp
+-    Format/DRC.cpp
+-    Format/DRC.hpp
++    #Format/DRC.cpp
++    #Format/DRC.hpp
+     Format/bbs_3mf.cpp
+     Format/bbs_3mf.hpp
+     format.hpp
+@@ -543,7 +543,7 @@ find_package(OpenCASCADE REQUIRED)
+ target_include_directories(libslic3r SYSTEM PUBLIC ${OpenCASCADE_INCLUDE_DIR})
+ 
+ find_package(JPEG REQUIRED)
+-find_package(draco REQUIRED)
++#find_package(draco REQUIRED)
+ find_package(Qhull REQUIRED)
+ find_package(Blosc REQUIRED)
+ find_package(GLEW REQUIRED)
+@@ -597,7 +597,5 @@ target_link_libraries(libslic3r
+         cereal::cereal
+         clipper
+         Clipper2
+-        draco::draco
+-        eigen
+         glu-libtess
+         JPEG::JPEG
+diff --git a/src/libslic3r/Model.cpp b/src/libslic3r/Model.cpp
+index 05a56c3a47..98c17c532a 100644
+--- a/src/libslic3r/Model.cpp
++++ b/src/libslic3r/Model.cpp
+@@ -313,8 +313,8 @@ Model Model::read_from_file(const std::string&
+         result = load_svg(input_file.c_str(), &model, message);
+     //BBS: remove the old .amf.xml files
+     //else if (boost::algorithm::iends_with(input_file, ".amf") || boost::algorithm::iends_with(input_file, ".amf.xml"))
+-    else if (boost::algorithm::iends_with(input_file, ".drc"))
+-        result = load_drc(input_file.c_str(), &model);
++    //else if (boost::algorithm::iends_with(input_file, ".drc"))
++    //    result = load_drc(input_file.c_str(), &model);
+     else if (boost::algorithm::iends_with(input_file, ".amf"))
+         //BBS: is_xxx is used for is_inches when load amf
+         result = load_amf(input_file.c_str(), config, config_substitutions, &model, is_xxx);
+diff --git a/src/slic3r/GUI/GUI_App.cpp b/src/slic3r/GUI/GUI_App.cpp
+index c79826733e..9f0bc91303 100644
+--- a/src/slic3r/GUI/GUI_App.cpp
++++ b/src/slic3r/GUI/GUI_App.cpp
+@@ -575,7 +575,7 @@ static const FileWildcards file_wildcards_by_type[FT_SIZE] = {
+     /* FT_SVG */     { L("SVG files"),       { ".svg"sv } },
+     /* FT_TEX */     { L("Texture"),         { ".png"sv, ".svg"sv } },
+     /* FT_SL1 */     { L("Masked SLA files"), { ".sl1"sv, ".sl1s"sv } },
+-    /* FT_DRC */     { L("Draco files"),     { ".drc"sv } },
++    /* FT_DRC */     //{ L("Draco files"),     { ".drc"sv } },
+ };
+ 
+ // This function produces a Win32 file dialog file template mask to be consumed by wxWidgets on all platforms.
+diff --git a/src/slic3r/GUI/GUI_Factories.cpp b/src/slic3r/GUI/GUI_Factories.cpp
+index 831b4c5f34..f4e651e303 100644
+--- a/src/slic3r/GUI/GUI_Factories.cpp
++++ b/src/slic3r/GUI/GUI_Factories.cpp
+@@ -915,7 +915,7 @@ void MenuFactory::append_menu_item_export_stl(wxMenu* menu, bool is_mulity_menu)
+ 
+ void MenuFactory::append_menu_item_export_drc(wxMenu* menu, bool is_mulity_menu)
+ {
+-    append_menu_item(menu, wxID_ANY, _L("Export as one DRC") + dots, "",
++    /*append_menu_item(menu, wxID_ANY, _L("Export as one DRC") + dots, "",
+         [](wxCommandEvent&) { plater()->export_stl(false, true, false, FT_DRC); }, "", nullptr,
+         [is_mulity_menu]() {
+             const Selection& selection = plater()->canvas3D()->get_selection();
+@@ -931,7 +931,7 @@ void MenuFactory::append_menu_item_export_drc(wxMenu* menu, bool is_mulity_menu)
+         []() {
+             const Selection& selection = plater()->canvas3D()->get_selection();
+             return selection.is_multiple_full_instance() || selection.is_multiple_full_object();
+-        }, m_parent);
++        }, m_parent);*/
+ }
+ 
+ void MenuFactory::append_menu_item_reload_from_disk(wxMenu* menu)
+diff --git a/src/slic3r/GUI/MainFrame.cpp b/src/slic3r/GUI/MainFrame.cpp
+index 70c622ee6c..95fd617a11 100644
+--- a/src/slic3r/GUI/MainFrame.cpp
++++ b/src/slic3r/GUI/MainFrame.cpp
+@@ -2744,12 +2744,12 @@ void MainFrame::init_menubar_as_editor()
+         append_menu_item(export_menu, wxID_ANY, _L("Export all objects as STLs") + dots, _L("Export all objects as STLs"),
+             [this](wxCommandEvent&) { if (m_plater) m_plater->export_stl(false, false, true); }, "menu_export_stl", nullptr,
+             [this](){return can_export_model(); }, this);
+-        append_menu_item(export_menu, wxID_ANY, _L("Export all objects as one DRC") + dots, _L("Export all objects as one DRC"),
++        /*append_menu_item(export_menu, wxID_ANY, _L("Export all objects as one DRC") + dots, _L("Export all objects as one DRC"),
+             [this](wxCommandEvent&) { if (m_plater) m_plater->export_stl(false, false, false, FT_DRC); }, "menu_export_stl", nullptr,
+             [this](){return can_export_model(); }, this);
+         append_menu_item(export_menu, wxID_ANY, _L("Export all objects as DRCs") + dots, _L("Export all objects as DRCs"),
+             [this](wxCommandEvent&) { if (m_plater) m_plater->export_stl(false, false, true, FT_DRC); }, "menu_export_stl", nullptr,
+-            [this](){return can_export_model(); }, this);
++            [this](){return can_export_model(); }, this);*/
+         append_menu_item(export_menu, wxID_ANY, _L("Export Generic 3MF") + dots/* + "\t" + ctrl + "G"*/, _L("Export 3MF file without using some 3mf-extensions"),
+             [this](wxCommandEvent&) { if (m_plater) m_plater->export_core_3mf(); }, "menu_export_sliced_file", nullptr,
+             [this](){return can_export_model(); }, this);
+diff --git a/src/slic3r/GUI/Plater.cpp b/src/slic3r/GUI/Plater.cpp
+index 40b984d34c..244ec77e0d 100644
+--- a/src/slic3r/GUI/Plater.cpp
++++ b/src/slic3r/GUI/Plater.cpp
+@@ -7137,7 +7137,7 @@ wxString Plater::priv::get_export_file(GUI::FileType file_type)
+     wxString wildcard;
+     switch (file_type) {
+         case FT_STL:
+-        case FT_DRC:
++        //case FT_DRC:
+         case FT_AMF:
+         case FT_3MF:
+         case FT_GCODE:
+@@ -7159,12 +7159,12 @@ wxString Plater::priv::get_export_file(GUI::FileType file_type)
+             dlg_title = _L("Export STL file:");
+             break;
+         }
+-        case FT_DRC:
++        /*case FT_DRC:
+         {
+             output_file.replace_extension("drc");
+             dlg_title = _L("Export Draco file:");
+             break;
+-        }
++        }*/
+         case FT_AMF:
+         {
+             // XXX: Problem on OS X with double extension?
+@@ -14955,7 +14955,7 @@ void Plater::export_stl(bool extended, bool selection_only, bool multi_stls, Fil
+ 
+     int quality = 0;
+ 
+-    switch (file_type) {
++    /*switch (file_type) {
+     case FT_DRC:
+         AppConfig* app_config = wxGetApp().app_config;
+         if (app_config)
+@@ -14963,7 +14963,7 @@ void Plater::export_stl(bool extended, bool selection_only, bool multi_stls, Fil
+         else
+             quality = DRC_BITS_DEFAULT;
+         break;
+-    }
++    }*/
+ 
+     wxString path;
+     if (multi_stls) {
+@@ -15124,7 +15124,7 @@ void Plater::export_stl(bool extended, bool selection_only, bool multi_stls, Fil
+         std::string ext = "";
+         switch (file_type) {
+         case FT_STL: ext = ".stl"; break;
+-        case FT_DRC: ext = ".drc"; break;
++        //case FT_DRC: ext = ".drc"; break;
+         }
+ 
+         auto path = dir + name + ext;
+@@ -15165,7 +15165,7 @@ void Plater::export_stl(bool extended, bool selection_only, bool multi_stls, Fil
+ 
+                 switch (file_type) {
+                 case FT_STL: Slic3r::store_stl(get_save_file(path_u8, object->name).c_str(), &mesh, true); break;
+-                case FT_DRC: Slic3r::store_drc(get_save_file(path_u8, object->name).c_str(), &mesh, quality); break;
++                //case FT_DRC: Slic3r::store_drc(get_save_file(path_u8, object->name).c_str(), &mesh, quality); break;
+                 }
+             }
+             return;
+@@ -15182,7 +15182,7 @@ void Plater::export_stl(bool extended, bool selection_only, bool multi_stls, Fil
+ 
+             switch (file_type) {
+             case FT_STL: Slic3r::store_stl(get_save_file(path_u8, o->name).c_str(), &mesh, true); break;
+-            case FT_DRC: Slic3r::store_drc(get_save_file(path_u8, o->name).c_str(), &mesh, quality); break;
++            //case FT_DRC: Slic3r::store_drc(get_save_file(path_u8, o->name).c_str(), &mesh, quality); break;
+             }
+         }
+         return;
+@@ -15190,7 +15190,7 @@ void Plater::export_stl(bool extended, bool selection_only, bool multi_stls, Fil
+ 
+     switch (file_type) {
+     case FT_STL: Slic3r::store_stl(path_u8.c_str(), &mesh, true); break;
+-    case FT_DRC: Slic3r::store_drc(path_u8.c_str(), &mesh, quality); break;
++    //case FT_DRC: Slic3r::store_drc(path_u8.c_str(), &mesh, quality); break;
+     }
+ }
+ 
+-- 
+2.53.0
+

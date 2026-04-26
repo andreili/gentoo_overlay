@@ -1,0 +1,47 @@
+From e3cc2acf3ba9c725663c9d2f768bf8e2ea7fd71f Mon Sep 17 00:00:00 2001
+From: Andrey Leonchikov <andreil499@gmail.com>
+Date: Sat, 25 Apr 2026 11:20:46 +0200
+Subject: [PATCH 04/11] Move GLEW/cereal/NLopt to system library.
+
+---
+ build.sh                          |     6 +-
+ sandboxes/opencsg/CMakeLists.txt  |     2 +-
+ src/libslic3r/CMakeLists.txt      |     3 +
+ ff
+
+diff --git a/sandboxes/opencsg/CMakeLists.txt b/sandboxes/opencsg/CMakeLists.txt
+index ace8f4d539..35c75d9770 100644
+--- a/sandboxes/opencsg/CMakeLists.txt
++++ b/sandboxes/opencsg/CMakeLists.txt
+@@ -13,7 +13,7 @@ add_executable(opencsg_example WIN32
+ 
+ find_package(wxWidgets 3.1 REQUIRED COMPONENTS core base gl html)
+ find_package(OpenGL REQUIRED)
+-find_package(GLEW REQUIRED)
++#find_package(GLEW REQUIRED)
+ find_package(OpenCSG REQUIRED)
+ include(${wxWidgets_USE_FILE})
+ 
+diff --git a/src/libslic3r/CMakeLists.txt b/src/libslic3r/CMakeLists.txt
+index f6fd867f30..5e2cf9df10 100644
+--- a/src/libslic3r/CMakeLists.txt
++++ b/src/libslic3r/CMakeLists.txt
+@@ -545,6 +545,8 @@ find_package(JPEG REQUIRED)
+ find_package(draco REQUIRED)
+ find_package(Qhull REQUIRED)
+ find_package(Blosc REQUIRED)
++find_package(GLEW REQUIRED)
++find_package(NLopt REQUIRED)
+ 
+ find_library(GMP_LIBRARY NAMES gmp libgmp)
+ find_library(MPFR_LIBRARY NAMES mpfr libmpfr)
+@@ -583,5 +585,6 @@ target_link_libraries(libslic3r
+         miniz
+         opencv_world
++        GLEW::GLEW
+     PRIVATE
+         ${CMAKE_DL_LIBS}
+         ${EXPAT_LIBRARIES}
+-- 
+2.53.0
+

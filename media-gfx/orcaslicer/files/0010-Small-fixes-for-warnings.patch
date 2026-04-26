@@ -1,0 +1,84 @@
+From dfc48fc51bbf573883f93a77412ae16b69357654 Mon Sep 17 00:00:00 2001
+From: Andrey Leonchikov <andreil499@gmail.com>
+Date: Sun, 26 Apr 2026 07:55:41 +0200
+Subject: [PATCH 10/11] Small fixes for warnings.
+
+---
+ deps_src/imgui/imgui_widgets.cpp                 | 2 +-
+ deps_src/mcut/include/mcut/internal/cdt/kdtree.h | 8 ++++----
+ deps_src/mcut/source/frontend.cpp                | 5 ++++-
+ src/slic3r/GUI/Widgets/StateColor.cpp            | 4 +++-
+ 4 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/deps_src/imgui/imgui_widgets.cpp b/deps_src/imgui/imgui_widgets.cpp
+index 65f0bc5260..73eacf7f8d 100644
+--- a/deps_src/imgui/imgui_widgets.cpp
++++ b/deps_src/imgui/imgui_widgets.cpp
+@@ -267,7 +267,7 @@ void ImGui::Text(const char* fmt, ...)
+ void ImGui::TextCentered(const char* text, ...)
+ {
+     va_list vaList;
+-    va_start(vaList,&text);
++    va_start(vaList, text);
+ 
+     float font_size = ImGui::GetFontSize() * strlen(text) / 2;
+     ImGui::SameLine(ImGui::GetCursorPos().x / 2 - font_size + (font_size / 2));
+diff --git a/deps_src/mcut/include/mcut/internal/cdt/kdtree.h b/deps_src/mcut/include/mcut/internal/cdt/kdtree.h
+index 0517fa777a..d68de3d67f 100644
+--- a/deps_src/mcut/include/mcut/internal/cdt/kdtree.h
++++ b/deps_src/mcut/include/mcut/internal/cdt/kdtree.h
+@@ -338,10 +338,10 @@ private:
+ 
+     // used for nearest query
+     struct NearestTask {
+-        std::uint32_t node;
+-        point_type min, max;
+-        NodeSplitDirection::Enum dir;
+-        coord_type distSq;
++        std::uint32_t node = 0;
++        point_type min, max = point_type();
++        NodeSplitDirection::Enum dir = NodeSplitDirection::Enum::X;
++        coord_type distSq = 0.0;
+         NearestTask()
+         {
+         }
+diff --git a/deps_src/mcut/source/frontend.cpp b/deps_src/mcut/source/frontend.cpp
+index 467e111775..9a0daae4b7 100644
+--- a/deps_src/mcut/source/frontend.cpp
++++ b/deps_src/mcut/source/frontend.cpp
+@@ -152,7 +152,10 @@ inline int trailing_zeroes(uint32_t v)
+ #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+ #endif
+ 
+-    r = (*(uint32_t*)&f >> 23) - 0x7f;
++    union FV { float f; uint32_t v; };
++    FV fv;
++    fv.f = (float)(v & -v);
++    r = (fv.v >> 23) - 0x7f;
+ 
+ #if __linux__
+ #pragma GCC diagnostic pop
+diff --git a/src/slic3r/GUI/Widgets/StateColor.cpp b/src/slic3r/GUI/Widgets/StateColor.cpp
+index d400f53de6..dfbd1a21a6 100644
+--- a/src/slic3r/GUI/Widgets/StateColor.cpp
++++ b/src/slic3r/GUI/Widgets/StateColor.cpp
+@@ -1,5 +1,7 @@
+ #include "StateColor.hpp"
+ #include <cmath>
++#include <iostream>
++#include <wx/log.h>
+ 
+ static bool gDarkMode = false;
+ 
+@@ -44,7 +46,7 @@ static std::map<wxColour, wxColour> gDarkColors{
+     {"#ABABAB", "#ABABAB"},
+     {"#D9D9D9", "#2D2D32"}, // rgb(217, 217, 217)  Sidebar > Toggle button track color
+     {"#EBF9F0", "#293F34"},
+-    //{"#F0F0F0", "#4C4C54"},
++    {"#F0F0F0", "#4C4C54"},
+     // ORCA
+     {"#BFE1DE", "#223C3C"}, // rgb(191, 225, 222)  Dropdown checked item background color > ORCA color with %25 opacity
+     {"#E5F0EE", "#283232"}, // rgb(229, 240, 238)  Combo / Dropdown focused background color > ORCA color with %10 opacity
+-- 
+2.53.0
+
