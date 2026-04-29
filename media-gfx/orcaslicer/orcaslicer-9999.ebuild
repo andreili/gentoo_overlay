@@ -1,9 +1,21 @@
 # Copyright 2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-
 EAPI=8
 
-WX_GTK_VER="3.2-gtk3"
+DESCRIPTION="G-code generator for 3D printers (Bambu, Prusa, Voron, VzBot, RatRig, Creality, etc.)"
+HOMEPAGE="https://www.orcaslicer.com/"
+if [[ ${PV} == 9999 ]]; then
+    WX_GTK_VER="3.3-gtk3"
+    inherit git-r3
+    EGIT_REPO_URI="https://github.com/OrcaSlicer/OrcaSlicer.git"
+    KEYWORDS=""
+    S="${WORKDIR}/orcaslicer-${PV}"
+else
+    WX_GTK_VER="3.2-gtk3"
+    SRC_URI="https://github.com/SoftFever/OrcaSlicer/archive/refs/tags/v${PV}.tar.gz"
+    S="${WORKDIR}/OrcaSlicer-${PV}"
+fi
+
 CMAKE_BUILD_TYPE="Release"
 
 inherit cmake desktop wxwidgets xdg
@@ -14,18 +26,6 @@ LICENSE="AGPL3 GPL3"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
-
-DESCRIPTION="G-code generator for 3D printers (Bambu, Prusa, Voron, VzBot, RatRig, Creality, etc.)"
-HOMEPAGE="https://www.orcaslicer.com/"
-if [[ ${PV} == 9999 ]]; then
-    inherit git-r3
-    EGIT_REPO_URI="https://github.com/OrcaSlicer/OrcaSlicer.git"
-    KEYWORDS=""
-    S="${WORKDIR}/orcaslicer-${PV}"
-else
-    SRC_URI="https://github.com/SoftFever/OrcaSlicer/archive/refs/tags/v${PV}.tar.gz"
-    S="${WORKDIR}/OrcaSlicer-${PV}"
-fi
 
 DEPEND="
     net-misc/curl[ssl]
@@ -74,6 +74,7 @@ PATCHES=(
     "${FILESDIR}/0010-Small-fixes-for-warnings.patch"
     "${FILESDIR}/0011-Disable-Draco-files-support.patch"
     "${FILESDIR}/0012-gentoo-libs.patch"
+    "${FILESDIR}/0013-fix-warnings.patch"
 )
 
 src_configure() {

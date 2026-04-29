@@ -1,0 +1,27 @@
+diff --git a/src/slic3r/GUI/MainFrame.cpp b/src/slic3r/GUI/MainFrame.cpp
+index ea143398..b83c473a 100644
+--- a/src/slic3r/GUI/MainFrame.cpp
++++ b/src/slic3r/GUI/MainFrame.cpp
+@@ -122,7 +122,7 @@ public:
+         , m_frame(frame)
+         , m_edge(edge)
+     {
+-        SetBackgroundStyle(wxBG_STYLE_TRANSPARENT);
++        //SetBackgroundStyle(wxBG_STYLE_TRANSPARENT);
+         Bind(wxEVT_MOTION,       &ResizeEdgePanel::OnCursorUpdate, this);
+         Bind(wxEVT_ENTER_WINDOW, &ResizeEdgePanel::OnCursorUpdate, this);
+         Bind(wxEVT_LEFT_DOWN,    &ResizeEdgePanel::OnLeftDown,     this);
+diff --git a/src/slic3r/GUI/Widgets/DropDown.cpp b/src/slic3r/GUI/Widgets/DropDown.cpp
+index 2f8c0416..3af2a52a 100644
+--- a/src/slic3r/GUI/Widgets/DropDown.cpp
++++ b/src/slic3r/GUI/Widgets/DropDown.cpp
+@@ -554,7 +554,8 @@ void DropDown::messureSize()
+     wxWindow::SetSize(szContent);
+ #ifdef __WXGTK__
+     // Gtk has a wrapper window for popup widget
+-    gtk_window_resize (GTK_WINDOW (m_widget), szContent.x, szContent.y);
++    if (szContent.x > 0 && szContent.y > 0)
++    { gtk_window_resize (GTK_WINDOW (m_widget), szContent.x, szContent.y); }
+ #endif
+     if (!groups.empty() && subDropDown == nullptr) {
+         subDropDown = new DropDown(items);
