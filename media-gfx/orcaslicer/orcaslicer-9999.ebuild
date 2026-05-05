@@ -75,7 +75,16 @@ PATCHES=(
     "${FILESDIR}/0011-Disable-Draco-files-support.patch"
     "${FILESDIR}/0012-gentoo-libs.patch"
     "${FILESDIR}/0013-fix-warnings.patch"
+    "${FILESDIR}/0014-CGAL-warnings.patch"
+    "${FILESDIR}/0015-Reduce-warnings-stemming-from-libslic3r-Config.hpp.patch"
 )
+
+src_prepare() {
+    if [[ ${PV} == 9999 ]]; then
+        eapply "${FILESDIR}/0016-Fix-new-features-compilation.patch"
+    fi
+    cmake_src_prepare
+}
 
 src_configure() {
     setup-wxwidgets
