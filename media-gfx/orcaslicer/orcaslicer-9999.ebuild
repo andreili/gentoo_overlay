@@ -2,12 +2,25 @@
 # Distributed under the terms of the GNU General Public License v2
 EAPI=8
 
+DRACO_VER="1.5.7"
+DRACO_FN="draco_${DRACO_VER}.zip"
+CGAL_VER="5.6.3"
+CGAL_FN="CGAL-${CGAL_VER}.zip"
+EIGEN_VER="5.0.1"
+EIGEN_FN="eigen-${EIGEN_VER}.zip"
+NOISE_VER="1.0"
+NOISE_FN="libnoise-${NOISE_VER}.zip"
+
 DESCRIPTION="G-code generator for 3D printers (Bambu, Prusa, Voron, VzBot, RatRig, Creality, etc.)"
 HOMEPAGE="https://www.orcaslicer.com/"
 if [[ ${PV} == 9999 ]]; then
     WX_GTK_VER="3.3-gtk3"
     inherit git-r3
     EGIT_REPO_URI="https://github.com/OrcaSlicer/OrcaSlicer.git"
+    SRC_URI="https://github.com/google/draco/archive/refs/tags/${DRACO_VER}.zip -> ${DRACO_FN}
+	     https://github.com/CGAL/cgal/releases/download/v${CGAL_VER}/${CGAL_FN}
+	     https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_VER}/${EIGEN_FN}
+	     https://github.com/SoftFever/Orca-deps-libnoise/archive/refs/tags/${NOISE_VER}.zip -> ${NOISE_FN}"
     KEYWORDS=""
     S="${WORKDIR}/orcaslicer-${PV}"
 else
@@ -52,6 +65,7 @@ DEPEND="
     dev-libs/md4c
     media-libs/nanosvg
     dev-cpp/nlohmann_json
+    media-libs/openexr
 "
 RDEPEND="
     ${DEPEND}
@@ -62,45 +76,43 @@ BDEPEND="
 "
 
 PATCHES=(
-    "${FILESDIR}/0001-Use-system-GMP-MPFR.patch"
-    "${FILESDIR}/0002-Move-to-external-OCCT-library_${PV}.patch"
-    "${FILESDIR}/0003-Move-Blosc-CURL-OpenSSL-Qhull-to-system-library.patch"
-    "${FILESDIR}/0004-Move-GLEW-cereal-NLopt-to-system-library.patch"
-    "${FILESDIR}/0005-Move-to-CGAL-6.1-system-lib.patch"
-    "${FILESDIR}/0006-Move-GLWF-TBB-OpenVDB-OpenCSG-to-system-sibrary.patch"
-    "${FILESDIR}/0007-Move-OpenCV-to-a-system-lib.patch"
-    "${FILESDIR}/0008-Move-Wx-to-system-lib_${PV}.patch"
-    "${FILESDIR}/0009-Fix-new-boost-library-usage.patch"
-    "${FILESDIR}/0010-Small-fixes-for-warnings.patch"
-    "${FILESDIR}/0011-Disable-Draco-files-support.patch"
-    "${FILESDIR}/0012-gentoo-libs.patch"
-    "${FILESDIR}/0013-fix-warnings.patch"
-    "${FILESDIR}/0014-CGAL-warnings.patch"
-    "${FILESDIR}/0015-Reduce-warnings-stemming-from-libslic3r-Config.hpp.patch"
+    "${FILESDIR}/0001-all-${PV}.patch"
 )
 
 src_prepare() {
-    if [[ ${PV} == 9999 ]]; then
-        eapply "${FILESDIR}/0016-Fix-new-features-compilation.patch"
-    fi
     cmake_src_prepare
 }
 
 src_configure() {
     setup-wxwidgets
+}
+
+src_compile() {
+    mkdir -p "${S}/deps/DL_CACHE/Draco"
+    cp "${DISTDIR}/${DRACO_FN}" "${S}/deps/DL_CACHE/Draco/${DRACO_VER}.zip"
+    mkdir -p "${S}/deps/DL_CACHE/CGAL"
+    cp "${DISTDIR}/${CGAL_FN}" "${S}/deps/DL_CACHE/CGAL/${CGAL_FN}"
+    mkdir -p "${S}/deps/DL_CACHE/Eigen"
+    cp "${DISTDIR}/${EIGEN_FN}" "${S}/deps/DL_CACHE/Eigen/${EIGEN_FN}"
+    mkdir -p "${S}/deps/DL_CACHE/libnoise"
+    cp "${DISTDIR}/${NOISE_FN}" "${S}/deps/DL_CACHE/libnoise/${NOISE_VER}.zip"
+    cmake_run_in ${S} cmake -S ${S}/deps -B deps/${P}_build -Wno-dev -DSYS_LIBS=all || die
+    cmake_run_in ${S} cmake --build deps/${P}_build -j1 || die
+
     local mycmakeargs=(
 	-DSLIC3R_GTK=3
 	-DSLIC3R_STATIC=OFF
 	-DSLIC3R_FHS=1
 	-DSLIC3R_PCH=0
-	
 	-DBBL_RELEASE_TO_PUBLIC=1
 	-DBBL_INTERNAL_TESTING=0
 	
 	-DORCA_TOOLS=ON
 	-DUSE_BLOSC=TRUE
+	-DSYS_LIBS=all
     )
     cmake_src_configure
+    cmake_build
 }
 
 src_install() {
