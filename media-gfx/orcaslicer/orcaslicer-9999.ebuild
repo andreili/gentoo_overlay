@@ -39,6 +39,11 @@ LICENSE="AGPL3 GPL3"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
+#REQUIRED_USE="
+#    system_exr? ( system_vdb )
+#    stsrem_glfw? ( system_vdb )
+#    system_zlib? ( system_ssl )
+#"
 
 DEPEND="
     net-misc/curl[ssl]
@@ -53,15 +58,12 @@ DEPEND="
     media-libs/opencv[png]
     media-libs/qhull[static-libs]
     x11-libs/wxGTK:${WX_GTK_VER}=[webkit,curl,keyring]
-    sci-mathematics/cgal
     sci-libs/opencascade
     dev-libs/cereal
     media-gfx/opencsg
     sci-libs/nlopt
     sci-mathematics/clipper2
     dev-cpp/fast_float
-    dev-libs/hidapi
-    sci-libs/libigl
     dev-libs/md4c
     media-libs/nanosvg
     dev-cpp/nlohmann_json
