@@ -1,15 +1,15 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index c7fa3f12cf..5d65a2616e 100644
+index e24e296ad4..fea645dd39 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -134,6 +134,23 @@ set(SLIC3R_GTK "3" CACHE STRING "GTK version to use with wxWidgets on Linux")
  
  set(IS_CROSS_COMPILE FALSE)
  
-+option(SYS_LIBS "Compile OrcaSlicer with system libraries, if possible (e.g. 'opencv;openvdb;wxwidgets;boost;tbb;eigen;cgal')" ${SYS_LIBS})
++option(SYS_LIBS "Compile OrcaSlicer with system libraries, if possible (e.g. 'opencv;openvdb;wxwidgets;boost;tbb;cgal')" ${SYS_LIBS})
 +
 +if (SYS_LIBS)
-+    set(SYS_LIBS_ALL "opencv;openvdb;wxwidgets;boost;tbb;eigen;cgal")
++    set(SYS_LIBS_ALL "opencv;openvdb;wxwidgets;boost;tbb;cgal")
 +    if (SYS_LIBS MATCHES "all")
 +        set(SYS_LIBS ${SYS_LIBS_ALL})
 +    endif()
@@ -26,7 +26,7 @@ index c7fa3f12cf..5d65a2616e 100644
  option (COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
  if (${COLORED_OUTPUT})
      if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-@@ -558,7 +575,7 @@ list(REMOVE_DUPLICATES CMAKE_C_FLAGS_RELWITHDEBINFO)
+@@ -565,7 +582,7 @@ list(REMOVE_DUPLICATES CMAKE_C_FLAGS_RELWITHDEBINFO)
  list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS_RELWITHDEBINFO)
  
  # Find and configure boost
@@ -35,7 +35,7 @@ index c7fa3f12cf..5d65a2616e 100644
      # Use static boost libraries.
      set(Boost_USE_STATIC_LIBS ON)
      # Use boost libraries linked statically to the C++ runtime.
-@@ -574,7 +591,12 @@ if(POLICY CMP0167)
+@@ -581,7 +598,12 @@ if(POLICY CMP0167)
    cmake_policy(SET CMP0167 NEW)
  endif()
  set(Boost_NO_SYSTEM_PATHS TRUE)
@@ -49,7 +49,7 @@ index c7fa3f12cf..5d65a2616e 100644
  
  # Find and configure Eigen3
  find_package(Eigen3 5.0.1 REQUIRED)
-@@ -587,7 +609,7 @@ if (APPLE)
+@@ -594,7 +616,7 @@ if (APPLE)
      target_compile_definitions(boost_headeronly INTERFACE BOOST_ASIO_DISABLE_KQUEUE)
  endif()
  
@@ -58,7 +58,7 @@ index c7fa3f12cf..5d65a2616e 100644
      target_compile_definitions(boost_headeronly INTERFACE BOOST_LOG_DYN_LINK)
  endif()
  
-@@ -607,7 +629,7 @@ target_include_directories(boost_headeronly SYSTEM INTERFACE ${Boost_INCLUDE_DIR
+@@ -614,7 +636,7 @@ target_include_directories(boost_headeronly SYSTEM INTERFACE ${Boost_INCLUDE_DIR
  target_link_libraries(boost_libs INTERFACE boost_headeronly ${Boost_LIBRARIES})
  
  # Find and configure intel-tbb
@@ -67,7 +67,7 @@ index c7fa3f12cf..5d65a2616e 100644
      set(TBB_STATIC 1)
  endif()
  set(TBB_DEBUG 1)
-@@ -744,14 +766,19 @@ endforeach()
+@@ -751,14 +773,19 @@ endforeach()
  find_package(NLopt 1.4 REQUIRED)
  
  
@@ -587,7 +587,7 @@ index d20f6f97ad..4870620146 100644
      CMAKE_ARGS
          -DBOOST_EXCLUDE_LIBRARIES:STRING=contract|fiber|numpy|stacktrace|wave|test
 diff --git a/deps/CMakeLists.txt b/deps/CMakeLists.txt
-index 7657b56738..fb4035ad10 100644
+index dbbf9a0463..5f14e483e1 100644
 --- a/deps/CMakeLists.txt
 +++ b/deps/CMakeLists.txt
 @@ -111,6 +111,44 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -635,7 +635,7 @@ index 7657b56738..fb4035ad10 100644
  set(IS_CROSS_COMPILE FALSE)
  
  if (APPLE)
-@@ -306,51 +344,175 @@ if(FLATPAK)
+@@ -310,51 +348,176 @@ if(FLATPAK)
      find_package(EXPAT)
      find_package(CURL)
      find_package(JPEG)
@@ -812,7 +812,8 @@ index 7657b56738..fb4035ad10 100644
 +    include(MPFR/MPFR.cmake)
 +endif()
 +
-+find_package(Eigen3 QUIET)
++find_package(Eigen3 5.0.1 QUIET)
++message(STATUS "Eigen3 version found: ${EIGEN3_VERSION}")
 +if(Eigen3_FOUND AND SYS_LIB_EIGEN)
 +    message(STATUS "Using Eigen from system.")
 +    add_library(dep_Eigen INTERFACE)
@@ -835,7 +836,7 @@ index 7657b56738..fb4035ad10 100644
  include(libnoise/libnoise.cmake)
  
  include(Draco/Draco.cmake)
-@@ -361,7 +523,12 @@ include(Draco/Draco.cmake)
+@@ -365,7 +528,12 @@ include(Draco/Draco.cmake)
  # a grep across the repo shows it is used for other things
  # TODO: update openssl and everything that uses <openssl/md5.h>
  set(OPENSSL_PKG "")
@@ -849,7 +850,7 @@ index 7657b56738..fb4035ad10 100644
      include(OpenSSL/OpenSSL.cmake)
      set(OPENSSL_PKG dep_OpenSSL)
  endif()
-@@ -370,26 +537,49 @@ endif()
+@@ -374,26 +542,49 @@ endif()
  # so, just don't even bother
  # ...i think this is how it works? change if wrong
  set(CURL_PKG "")
@@ -905,7 +906,7 @@ index 7657b56738..fb4035ad10 100644
      include(FREETYPE/FREETYPE.cmake)
      set(FREETYPE_PKG "dep_FREETYPE")
  endif()
-@@ -408,8 +598,24 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
+@@ -412,8 +603,24 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
      file(RELATIVE_PATH BINARY_DIR_REL  ${CMAKE_SOURCE_DIR}/.. ${CMAKE_BINARY_DIR})
  endif ()
  
@@ -933,10 +934,10 @@ index 7657b56738..fb4035ad10 100644
  set(_dep_list
      dep_Boost
 diff --git a/deps_src/CMakeLists.txt b/deps_src/CMakeLists.txt
-index 5c553835ad..876a30fa01 100644
+index a4d71c6f27..80d773fa29 100644
 --- a/deps_src/CMakeLists.txt
 +++ b/deps_src/CMakeLists.txt
-@@ -2,31 +2,78 @@ cmake_minimum_required(VERSION 3.13)
+@@ -2,31 +2,77 @@ cmake_minimum_required(VERSION 3.13)
  project(deps_src)
  
  # Include all dependency subdirectories
@@ -1018,15 +1019,14 @@ index 5c553835ad..876a30fa01 100644
 +else()
 +    add_subdirectory(md4c)
 +endif()
-+
+ add_subdirectory(mdns)
  add_subdirectory(miniz)
  add_subdirectory(minilzo)
- add_subdirectory(qhull)
 diff --git a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
-index bb42b48607..2657f16f3b 100644
+index 8c1f734e1c..ff7c132b64 100644
 --- a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
 +++ b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
-@@ -166,8 +166,8 @@ modules:
+@@ -176,8 +176,8 @@ modules:
  
        # Boost 1.84.0
        - type: file
@@ -1038,7 +1038,7 @@ index bb42b48607..2657f16f3b 100644
  
        # Eigen 5.0.1
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index f7de86410d..e1897c5334 100644
+index 73c767dad2..ba29ec018d 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -22,7 +22,7 @@ if (SLIC3R_GUI)
@@ -1051,7 +1051,7 @@ index f7de86410d..e1897c5334 100644
          else()
              set(wxWidgets_USE_STATIC OFF)
 diff --git a/src/libslic3r/CMakeLists.txt b/src/libslic3r/CMakeLists.txt
-index f4b7fbd652..eea68c983a 100644
+index 9b67d7ab50..eea68c983a 100644
 --- a/src/libslic3r/CMakeLists.txt
 +++ b/src/libslic3r/CMakeLists.txt
 @@ -489,7 +489,7 @@ add_library(libslic3r STATIC ${lisbslic3r_sources}
@@ -1143,10 +1143,10 @@ index 1e084cd35e..732ce711b1 100644
      std_err.clear();
      std::string line;
 diff --git a/src/slic3r/CMakeLists.txt b/src/slic3r/CMakeLists.txt
-index c4d6369b72..ce784af289 100644
+index 969dcb693a..792d8a7959 100644
 --- a/src/slic3r/CMakeLists.txt
 +++ b/src/slic3r/CMakeLists.txt
-@@ -804,7 +804,7 @@ if (UNIX AND NOT APPLE)
+@@ -816,7 +816,7 @@ if (UNIX AND NOT APPLE)
      find_package(GTK${SLIC3R_GTK} REQUIRED)
      pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
      pkg_check_modules(webkit2gtk REQUIRED webkit2gtk-4.1)
@@ -1169,10 +1169,10 @@ index 092594ce51..f53fbbea2c 100644
  
  #include "libslic3r/libslic3r.h"
 diff --git a/src/slic3r/GUI/GUI_App.cpp b/src/slic3r/GUI/GUI_App.cpp
-index f68535b619..d132b3cde8 100644
+index 875c78e56f..5974245771 100644
 --- a/src/slic3r/GUI/GUI_App.cpp
 +++ b/src/slic3r/GUI/GUI_App.cpp
-@@ -8036,7 +8036,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
+@@ -8331,7 +8331,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
  
      // Delete the .info file after cloud deletion is confirmed
      if (!preset_file_path.empty() && fs::exists(fs::path(preset_file_path))) {
@@ -1279,7 +1279,7 @@ index 83ec4695c7..bca6b7b049 100644
  		std::string line;
  		while (child.running() && std::getline(istd_err, line)) {
 diff --git a/src/slic3r/GUI/WebUserLoginDialog.cpp b/src/slic3r/GUI/WebUserLoginDialog.cpp
-index 2a9b4cb984..a7bbbb1ffd 100644
+index 4b8acc9455..edc2fa4381 100644
 --- a/src/slic3r/GUI/WebUserLoginDialog.cpp
 +++ b/src/slic3r/GUI/WebUserLoginDialog.cpp
 @@ -48,7 +48,7 @@ namespace {
