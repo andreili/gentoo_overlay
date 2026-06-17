@@ -1,6 +1,6 @@
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..11} )
+PYTHON_COMPAT=( python3_{13..14} )
 inherit cmake python-any-r1 git-r3
 
 DESCRIPTION="Hardware design requires too much effort, cost and time"
