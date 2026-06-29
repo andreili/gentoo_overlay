@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index e24e296ad4..fea645dd39 100644
+index 8dcd4cf004..77ddc2381a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -134,6 +134,23 @@ set(SLIC3R_GTK "3" CACHE STRING "GTK version to use with wxWidgets on Linux")
@@ -572,13 +572,13 @@ index a091002347..05c8eff904 100644
  set(_OPENVDB_DEFINITIONS)
  if(OpenVDB_ABI)
 diff --git a/deps/Boost/Boost.cmake b/deps/Boost/Boost.cmake
-index d20f6f97ad..4870620146 100644
+index bdd801857e..d6e1e2b2f8 100644
 --- a/deps/Boost/Boost.cmake
 +++ b/deps/Boost/Boost.cmake
-@@ -11,8 +11,8 @@ if (APPLE AND CMAKE_OSX_ARCHITECTURES)
- endif ()
+@@ -26,8 +26,8 @@ endif ()
  
  orcaslicer_add_cmake_project(Boost
+     ${_options}
 -    URL "https://github.com/boostorg/boost/releases/download/boost-1.84.0/boost-1.84.0.tar.gz"
 -    URL_HASH SHA256=4d27e9efed0f6f152dc28db6430b9d3dfb40c0345da7342eaa5a987dde57bd95
 +    URL "https://github.com/boostorg/boost/releases/download/boost-1.91.0-1/boost-1.91.0-1-cmake.tar.xz"
@@ -587,7 +587,7 @@ index d20f6f97ad..4870620146 100644
      CMAKE_ARGS
          -DBOOST_EXCLUDE_LIBRARIES:STRING=contract|fiber|numpy|stacktrace|wave|test
 diff --git a/deps/CMakeLists.txt b/deps/CMakeLists.txt
-index dbbf9a0463..5f14e483e1 100644
+index 26a1860e33..f8e0bf1333 100644
 --- a/deps/CMakeLists.txt
 +++ b/deps/CMakeLists.txt
 @@ -111,6 +111,44 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -635,7 +635,7 @@ index dbbf9a0463..5f14e483e1 100644
  set(IS_CROSS_COMPILE FALSE)
  
  if (APPLE)
-@@ -310,51 +348,176 @@ if(FLATPAK)
+@@ -318,51 +356,176 @@ if(FLATPAK)
      find_package(EXPAT)
      find_package(CURL)
      find_package(JPEG)
@@ -836,7 +836,7 @@ index dbbf9a0463..5f14e483e1 100644
  include(libnoise/libnoise.cmake)
  
  include(Draco/Draco.cmake)
-@@ -365,7 +528,12 @@ include(Draco/Draco.cmake)
+@@ -373,7 +536,12 @@ include(Draco/Draco.cmake)
  # a grep across the repo shows it is used for other things
  # TODO: update openssl and everything that uses <openssl/md5.h>
  set(OPENSSL_PKG "")
@@ -850,7 +850,7 @@ index dbbf9a0463..5f14e483e1 100644
      include(OpenSSL/OpenSSL.cmake)
      set(OPENSSL_PKG dep_OpenSSL)
  endif()
-@@ -374,26 +542,49 @@ endif()
+@@ -382,26 +550,49 @@ endif()
  # so, just don't even bother
  # ...i think this is how it works? change if wrong
  set(CURL_PKG "")
@@ -906,7 +906,7 @@ index dbbf9a0463..5f14e483e1 100644
      include(FREETYPE/FREETYPE.cmake)
      set(FREETYPE_PKG "dep_FREETYPE")
  endif()
-@@ -412,8 +603,24 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
+@@ -420,8 +611,24 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
      file(RELATIVE_PATH BINARY_DIR_REL  ${CMAKE_SOURCE_DIR}/.. ${CMAKE_BINARY_DIR})
  endif ()
  
@@ -921,7 +921,7 @@ index dbbf9a0463..5f14e483e1 100644
 +    include(OCCT/OCCT.cmake)
 +endif()
 +
-+find_package(OpenCV REQUIRED core imgproc imgcodecs QUIET)
++find_package(OpenCV COMPONENTS core imgproc imgcodecs QUIET)
 +message(STATUS "OpenCV version found: ${OpenCV_LIB_COMPONENTS}")
 +if(OpenCV_FOUND AND SYS_LIB_OPENCV)
 +    message(STATUS "Using OpenCV from system.")
@@ -1023,7 +1023,7 @@ index a4d71c6f27..80d773fa29 100644
  add_subdirectory(miniz)
  add_subdirectory(minilzo)
 diff --git a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
-index 8c1f734e1c..ff7c132b64 100644
+index ef4ff42c60..c9dbc65f4f 100644
 --- a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
 +++ b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
 @@ -176,8 +176,8 @@ modules:
@@ -1169,10 +1169,10 @@ index 092594ce51..f53fbbea2c 100644
  
  #include "libslic3r/libslic3r.h"
 diff --git a/src/slic3r/GUI/GUI_App.cpp b/src/slic3r/GUI/GUI_App.cpp
-index 875c78e56f..5974245771 100644
+index b6ab6dc706..83201bcd3e 100644
 --- a/src/slic3r/GUI/GUI_App.cpp
 +++ b/src/slic3r/GUI/GUI_App.cpp
-@@ -8331,7 +8331,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
+@@ -8398,7 +8398,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
  
      // Delete the .info file after cloud deletion is confirmed
      if (!preset_file_path.empty() && fs::exists(fs::path(preset_file_path))) {
@@ -1195,7 +1195,7 @@ index 4c0b929663..0976092318 100644
          std::set<std::shared_ptr<session>> sessions;
  
 diff --git a/src/slic3r/GUI/MediaPlayCtrl.cpp b/src/slic3r/GUI/MediaPlayCtrl.cpp
-index 3478c91fa6..5dd23eec27 100644
+index 5737484960..5429f287c8 100644
 --- a/src/slic3r/GUI/MediaPlayCtrl.cpp
 +++ b/src/slic3r/GUI/MediaPlayCtrl.cpp
 @@ -16,6 +16,12 @@
