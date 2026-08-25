@@ -1,15 +1,129 @@
+diff --git a/.github/actions/apt-install-deps/action.yml b/.github/actions/apt-install-deps/action.yml
+index c850d0ea10..6abaa1baf4 100644
+--- a/.github/actions/apt-install-deps/action.yml
++++ b/.github/actions/apt-install-deps/action.yml
+@@ -8,4 +8,5 @@ runs:
+       run: |
+         mkdir -p ${{ github.workspace }}/deps/build/destdir
+         sudo env "ORCA_UPDATER_SIG_KEY=$ORCA_UPDATER_SIG_KEY" ./build_linux.sh -ur
++        echo "sudo chown $USER -R ./"
+         sudo chown $USER -R ./
+diff --git a/.github/workflows/build_check_cache.yml b/.github/workflows/build_check_cache.yml
+index b5c5b28b95..f530949a44 100644
+--- a/.github/workflows/build_check_cache.yml
++++ b/.github/workflows/build_check_cache.yml
+@@ -19,7 +19,7 @@ on:
+ jobs:
+   check_cache: # determines if there is a cache and outputs variables used in caching process
+     name: Check Cache
+-    runs-on: ${{ inputs.os }}
++    runs-on: self-hosted
+     outputs:
+       cache-key: ${{ steps.set_outputs.outputs.cache-key }}
+       cache-path: ${{ steps.set_outputs.outputs.cache-path }}
+diff --git a/.github/workflows/build_deps.yml b/.github/workflows/build_deps.yml
+index 9927f5bef6..40b23dd85f 100644
+--- a/.github/workflows/build_deps.yml
++++ b/.github/workflows/build_deps.yml
+@@ -27,7 +27,7 @@ jobs:
+   build_deps:
+     name: Build Deps
+     if: ${{ !cancelled() && (inputs.build-deps-only || inputs.force-build || inputs.valid-cache != true) }}
+-    runs-on: ${{ inputs.os }}
++    runs-on: self-hosted
+     env:
+       date:
+     steps:
+diff --git a/.github/workflows/build_orca.yml b/.github/workflows/build_orca.yml
+index 112c0b279b..381b93f8ba 100644
+--- a/.github/workflows/build_orca.yml
++++ b/.github/workflows/build_orca.yml
+@@ -21,7 +21,7 @@ on:
+ jobs:
+   build_orca:
+     name: Build OrcaSlicer
+-    runs-on: ${{ inputs.os }}
++    runs-on: self-hosted
+     env:
+       date:
+       ver:
+diff --git a/.github/workflows/check_locale.yml b/.github/workflows/check_locale.yml
+index fabca4bc37..f116a22099 100644
+--- a/.github/workflows/check_locale.yml
++++ b/.github/workflows/check_locale.yml
+@@ -11,7 +11,7 @@ on:
+ jobs:
+   check_translation:
+     name: Check translation
+-    runs-on: ubuntu-latest
++    runs-on: self-hosted
+     steps:  
+       - name: Checkout repository
+         uses: actions/checkout@v7
+diff --git a/.github/workflows/check_profiles.yml b/.github/workflows/check_profiles.yml
+index db3ae6c4e8..506959739d 100644
+--- a/.github/workflows/check_profiles.yml
++++ b/.github/workflows/check_profiles.yml
+@@ -27,7 +27,7 @@ jobs:
+     # This job name is the check-run name pr-merge-bot.yml requires before a
+     # delegated merge. Renaming it silently disables that gate.
+     name: Check profiles
+-    runs-on: ubuntu-24.04
++    runs-on: self-hosted
+     steps:
+       - name: Checkout repository
+         uses: actions/checkout@v7
+diff --git a/.github/workflows/check_profiles_comment.yml b/.github/workflows/check_profiles_comment.yml
+index 21098cc467..d5640f28dc 100644
+--- a/.github/workflows/check_profiles_comment.yml
++++ b/.github/workflows/check_profiles_comment.yml
+@@ -21,7 +21,7 @@ concurrency:
+ jobs:
+   post_comment:
+     name: Post PR comment
+-    runs-on: ubuntu-24.04
++    runs-on: self-hosted
+     if: ${{ github.event.workflow_run.event == 'pull_request' && (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure') }}
+     steps:
+       - name: Download artifact
+diff --git a/.github/workflows/dedupe-issues.yml b/.github/workflows/dedupe-issues.yml
+index a8c21edd01..3369126c2c 100644
+--- a/.github/workflows/dedupe-issues.yml
++++ b/.github/workflows/dedupe-issues.yml
+@@ -12,7 +12,7 @@ on:
+ 
+ jobs:
+   dedupe-issues:
+-    runs-on: ubuntu-latest
++    runs-on: self-hosted
+     timeout-minutes: 30
+     permissions:
+       contents: read
+diff --git a/.github/workflows/pr-label-bot.yml b/.github/workflows/pr-label-bot.yml
+index 1214db0776..a14045552d 100644
+--- a/.github/workflows/pr-label-bot.yml
++++ b/.github/workflows/pr-label-bot.yml
+@@ -21,7 +21,7 @@ jobs:
+       contents: read
+       pull-requests: write
+       issues: write
+-    runs-on: ubuntu-latest
++    runs-on: self-hosted
+     steps:
+       - name: Ask PR author for label
+         uses: actions/github-script@v9
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8dcd4cf004..77ddc2381a 100644
+index 9f0db669b8..2d9872d0f7 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -134,6 +134,23 @@ set(SLIC3R_GTK "3" CACHE STRING "GTK version to use with wxWidgets on Linux")
+@@ -272,6 +272,25 @@ set(SLIC3R_GTK "3" CACHE STRING "GTK version to use with wxWidgets on Linux")
  
  set(IS_CROSS_COMPILE FALSE)
  
 +option(SYS_LIBS "Compile OrcaSlicer with system libraries, if possible (e.g. 'opencv;openvdb;wxwidgets;boost;tbb;cgal')" ${SYS_LIBS})
 +
 +if (SYS_LIBS)
-+    set(SYS_LIBS_ALL "opencv;openvdb;wxwidgets;boost;tbb;cgal")
++    set(SYS_LIBS_ALL "opencv;openvdb;wxwidgets;boost;tbb;cgal;python3")
 +    if (SYS_LIBS MATCHES "all")
 +        set(SYS_LIBS ${SYS_LIBS_ALL})
 +    endif()
@@ -21,12 +135,14 @@ index 8dcd4cf004..77ddc2381a 100644
 +        set(SYS_LIB_${lib_upper} ON CACHE BOOL "Try to use system library for ${lib}")
 +        message(STATUS "System library for ${lib}: ${SYS_LIB_${lib_upper}}")
 +    ENDFOREACH()
++else()
++    message(STATUS "System libraries disabled (SYS_LIBS is empty)")
 +endif()
 +
  option (COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
  if (${COLORED_OUTPUT})
      if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-@@ -565,7 +582,7 @@ list(REMOVE_DUPLICATES CMAKE_C_FLAGS_RELWITHDEBINFO)
+@@ -715,7 +734,7 @@ list(REMOVE_DUPLICATES CMAKE_C_FLAGS_RELWITHDEBINFO)
  list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS_RELWITHDEBINFO)
  
  # Find and configure boost
@@ -35,7 +151,7 @@ index 8dcd4cf004..77ddc2381a 100644
      # Use static boost libraries.
      set(Boost_USE_STATIC_LIBS ON)
      # Use boost libraries linked statically to the C++ runtime.
-@@ -581,7 +598,12 @@ if(POLICY CMP0167)
+@@ -731,7 +750,12 @@ if(POLICY CMP0167)
    cmake_policy(SET CMP0167 NEW)
  endif()
  set(Boost_NO_SYSTEM_PATHS TRUE)
@@ -49,7 +165,7 @@ index 8dcd4cf004..77ddc2381a 100644
  
  # Find and configure Eigen3
  find_package(Eigen3 5.0.1 REQUIRED)
-@@ -594,7 +616,7 @@ if (APPLE)
+@@ -744,7 +768,7 @@ if (APPLE)
      target_compile_definitions(boost_headeronly INTERFACE BOOST_ASIO_DISABLE_KQUEUE)
  endif()
  
@@ -58,7 +174,7 @@ index 8dcd4cf004..77ddc2381a 100644
      target_compile_definitions(boost_headeronly INTERFACE BOOST_LOG_DYN_LINK)
  endif()
  
-@@ -614,7 +636,7 @@ target_include_directories(boost_headeronly SYSTEM INTERFACE ${Boost_INCLUDE_DIR
+@@ -764,7 +788,7 @@ target_include_directories(boost_headeronly SYSTEM INTERFACE ${Boost_INCLUDE_DIR
  target_link_libraries(boost_libs INTERFACE boost_headeronly ${Boost_LIBRARIES})
  
  # Find and configure intel-tbb
@@ -67,8 +183,36 @@ index 8dcd4cf004..77ddc2381a 100644
      set(TBB_STATIC 1)
  endif()
  set(TBB_DEBUG 1)
-@@ -751,14 +773,19 @@ endforeach()
+@@ -899,13 +923,22 @@ endforeach()
  find_package(NLopt 1.4 REQUIRED)
+ 
+ # Use bundled Python from deps instead of system Python
+-set(_bundled_python_version "3.12.13")
+-set(_bundled_python_abi "312")
++if(SYS_LIB_PYTHON3)
++    find_package(Python3 QUIET)
++    if(NOT Python3_FOUND)
++        message(FATAL_ERROR "Python3 not found. Please install Python3 or disable SYS_LIB_PYTHON3 to use the bundled Python3.")
++    endif()
++    set(_bundled_python_version "${Python3_VERSION}")
++    set(_bundled_python_abi "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
++else()
++    set(_bundled_python_version "3.12.13")
++    set(_bundled_python_abi "312")
++    set(_bundled_python_root "${CMAKE_PREFIX_PATH}/libpython")
++    set(Python3_ROOT_DIR "${_bundled_python_root}" CACHE PATH "Root directory for bundled Python" FORCE)
++    set(Python3_FIND_STRATEGY LOCATION)
++endif()
+ string(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\..*$" "\\1" _bundled_python_version_short "${_bundled_python_version}")
+-set(_bundled_python_root "${CMAKE_PREFIX_PATH}/libpython")
+-set(Python3_ROOT_DIR "${_bundled_python_root}" CACHE PATH "Root directory for bundled Python" FORCE)
+ set(Python3_USE_STATIC_LIBS OFF)
+-set(Python3_FIND_STRATEGY LOCATION)
+ set(Python3_FIND_IMPLEMENTATIONS CPython)
+ 
+ if(WIN32)
+@@ -979,14 +1012,19 @@ target_compile_definitions(pybind11_embed INTERFACE PYBIND11_SIMPLE_GIL_MANAGEME
+ add_library(pybind11::embed ALIAS pybind11_embed)
  
  
 -if(SLIC3R_STATIC)
@@ -525,10 +669,10 @@ index 0000000000..e12c0c386d
 +
 +endif()
 diff --git a/cmake/modules/FindOpenVDB.cmake b/cmake/modules/FindOpenVDB.cmake
-index a091002347..05c8eff904 100644
+index d2e101a0a6..df581df243 100644
 --- a/cmake/modules/FindOpenVDB.cmake
 +++ b/cmake/modules/FindOpenVDB.cmake
-@@ -348,6 +348,9 @@ macro(just_fail msg)
+@@ -352,6 +352,9 @@ macro(just_fail msg)
    return()
  endmacro()
  
@@ -538,7 +682,7 @@ index a091002347..05c8eff904 100644
  find_package(IlmBase QUIET)
  if(NOT IlmBase_FOUND)
    pkg_check_modules(IlmBase QUIET IlmBase)
-@@ -367,6 +370,10 @@ if (IlmBase_FOUND AND NOT TARGET IlmBase::Half)
+@@ -371,6 +374,10 @@ if (IlmBase_FOUND AND NOT TARGET IlmBase::Half)
  elseif(NOT IlmBase_FOUND)
    just_fail("IlmBase::Half can not be found!")
  endif()
@@ -549,7 +693,7 @@ index a091002347..05c8eff904 100644
  find_package(TBB ${_quiet} ${_required} COMPONENTS tbb)
  find_package(ZLIB ${_quiet} ${_required})
  find_package(Boost ${_quiet} ${_required} COMPONENTS iostreams system )
-@@ -469,11 +476,16 @@ endif()
+@@ -473,11 +480,16 @@ endif()
  # include paths from shared installs (including houdini) may pull in the wrong
  # headers
  
@@ -587,10 +731,10 @@ index bdd801857e..d6e1e2b2f8 100644
      CMAKE_ARGS
          -DBOOST_EXCLUDE_LIBRARIES:STRING=contract|fiber|numpy|stacktrace|wave|test
 diff --git a/deps/CMakeLists.txt b/deps/CMakeLists.txt
-index 26a1860e33..f8e0bf1333 100644
+index 8f4bc2a215..6cad9b5456 100644
 --- a/deps/CMakeLists.txt
 +++ b/deps/CMakeLists.txt
-@@ -111,6 +111,44 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+@@ -111,6 +111,69 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
      option(DEP_WX_GTK3 "Build wxWidgets against GTK3" ON)
  endif()
  
@@ -603,7 +747,32 @@ index 26a1860e33..f8e0bf1333 100644
 +
 +if (SYS_LIBS)
 +    #TODO: boost;cgal
-+    set(SYS_LIBS_ALL "zlib;png;gmp;mpfr;openssl;curl;jpeg;freetype;expat;opencv;cereal;qhull;opencsg;tbb;glew;glfw;nlopt;blosc;occt;openexr;openvdb;wxwidgets;boost")
++    set(SYS_LIBS_ALL "zlib")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};zlib")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};png")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};gmp")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};mpfr")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};openssl")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};curl")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};jpeg")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};freetype")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};expat")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};opencv")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};cereal")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};qhull")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};opencsg")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};tbb")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};glew")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};glfw")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};nlopt")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};blosc")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};occt")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};openexr")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};openvdb")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};wxwidgets")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};boost")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};python3")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};assimp")
 +    if (SYS_LIBS MATCHES "all")
 +        set(SYS_LIBS ${SYS_LIBS_ALL})
 +    endif()
@@ -635,7 +804,7 @@ index 26a1860e33..f8e0bf1333 100644
  set(IS_CROSS_COMPILE FALSE)
  
  if (APPLE)
-@@ -318,51 +356,176 @@ if(FLATPAK)
+@@ -318,57 +381,189 @@ if(FLATPAK)
      find_package(EXPAT)
      find_package(CURL)
      find_package(JPEG)
@@ -754,10 +923,7 @@ index 26a1860e33..f8e0bf1333 100644
 +    message(STATUS "Using OpenCSG from source.")
 +    include(OpenCSG/OpenCSG.cmake)
 +endif()
- 
--include(GMP/GMP.cmake)
--include(MPFR/MPFR.cmake)
--include(Eigen/Eigen.cmake)
++
 +find_package(TBB QUIET)
 +if(TBB_FOUND AND SYS_LIB_TBB)
 +    message(STATUS "Using TBB from system.")
@@ -775,7 +941,10 @@ index 26a1860e33..f8e0bf1333 100644
 +    message(STATUS "Using Blosc from source.")
 +    include(Blosc/Blosc.cmake)
 +endif()
-+
+ 
+-include(GMP/GMP.cmake)
+-include(MPFR/MPFR.cmake)
+-include(Eigen/Eigen.cmake)
 +find_package(OpenEXR QUIET)
 +if(OpenEXR_FOUND AND SYS_LIB_OPENEXR)
 +    message(STATUS "Using OpenEXR from system.")
@@ -836,7 +1005,21 @@ index 26a1860e33..f8e0bf1333 100644
  include(libnoise/libnoise.cmake)
  
  include(Draco/Draco.cmake)
-@@ -373,7 +536,12 @@ include(Draco/Draco.cmake)
+ 
+ # Assimp: glTF/GLB/FBX import for the texture-to-color feature.
+-include(Assimp/Assimp.cmake)
++find_package(assimp QUIET)
++if(assimp_FOUND AND SYS_LIB_ASSIMP)
++    message(STATUS "Using Assimp from system.")
++    add_library(dep_assimp INTERFACE)
++else()
++    message(STATUS "Using Assimp from source.")
++    include(Assimp/Assimp.cmake)
++endif()
+ 
+ 
+ # I *think* 1.1 is used for *just* md5 hashing?
+@@ -376,7 +571,12 @@ include(Assimp/Assimp.cmake)
  # a grep across the repo shows it is used for other things
  # TODO: update openssl and everything that uses <openssl/md5.h>
  set(OPENSSL_PKG "")
@@ -850,7 +1033,7 @@ index 26a1860e33..f8e0bf1333 100644
      include(OpenSSL/OpenSSL.cmake)
      set(OPENSSL_PKG dep_OpenSSL)
  endif()
-@@ -382,26 +550,49 @@ endif()
+@@ -385,26 +585,49 @@ endif()
  # so, just don't even bother
  # ...i think this is how it works? change if wrong
  set(CURL_PKG "")
@@ -906,12 +1089,13 @@ index 26a1860e33..f8e0bf1333 100644
      include(FREETYPE/FREETYPE.cmake)
      set(FREETYPE_PKG "dep_FREETYPE")
  endif()
-@@ -420,8 +611,24 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
+@@ -423,9 +646,34 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
      file(RELATIVE_PATH BINARY_DIR_REL  ${CMAKE_SOURCE_DIR}/.. ${CMAKE_BINARY_DIR})
  endif ()
  
 -include(OCCT/OCCT.cmake)
 -include(OpenCV/OpenCV.cmake)
+-include(python3/python3.cmake)
 +find_package(OpenCASCADE QUIET)
 +if(OpenCASCADE_FOUND AND SYS_LIB_OCCT)
 +    message(STATUS "Using OpenCASCADE from system.")
@@ -930,14 +1114,24 @@ index 26a1860e33..f8e0bf1333 100644
 +    message(STATUS "Using OpenCV from source.")
 +    include(OpenCV/OpenCV.cmake)
 +endif()
++
++find_package(Python3 QUIET)
++if(Python3_FOUND AND SYS_LIB_PYTHON3)
++    message(STATUS "Using Python3 from system.")
++    add_library(dep_python3 INTERFACE)
++else()
++    message(STATUS "Using Python3 from source.")
++    include(python3/python3.cmake)
++endif()
++
+ include(wxInspector/wxInspector.cmake)
  
  set(_dep_list
-     dep_Boost
 diff --git a/deps_src/CMakeLists.txt b/deps_src/CMakeLists.txt
-index a4d71c6f27..80d773fa29 100644
+index a4d71c6f27..d512b20c80 100644
 --- a/deps_src/CMakeLists.txt
 +++ b/deps_src/CMakeLists.txt
-@@ -2,31 +2,77 @@ cmake_minimum_required(VERSION 3.13)
+@@ -2,34 +2,87 @@ cmake_minimum_required(VERSION 3.13)
  project(deps_src)
  
  # Include all dependency subdirectories
@@ -1022,11 +1216,22 @@ index a4d71c6f27..80d773fa29 100644
  add_subdirectory(mdns)
  add_subdirectory(miniz)
  add_subdirectory(minilzo)
+-add_subdirectory(qhull)
++
++find_package(qhull QUIET)
++if (USE_SYS_LIBS AND qhull_FOUND)
++    message(STATUS "Using system qhull library")
++else()
++    add_subdirectory(qhull)
++endif()
++
+ add_subdirectory(qoi)
+ add_subdirectory(semver)      # Semver static library
 diff --git a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
-index ef4ff42c60..c9dbc65f4f 100644
+index d081e2f997..dac1522b3f 100644
 --- a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
 +++ b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
-@@ -176,8 +176,8 @@ modules:
+@@ -182,8 +182,8 @@ modules:
  
        # Boost 1.84.0
        - type: file
@@ -1038,7 +1243,7 @@ index ef4ff42c60..c9dbc65f4f 100644
  
        # Eigen 5.0.1
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 73c767dad2..ba29ec018d 100644
+index 0082b29831..24dc004ca0 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -22,7 +22,7 @@ if (SLIC3R_GUI)
@@ -1050,11 +1255,30 @@ index 73c767dad2..ba29ec018d 100644
              set(wxWidgets_USE_STATIC ON)
          else()
              set(wxWidgets_USE_STATIC OFF)
+@@ -334,11 +334,13 @@ else ()
+         COMMAND ln -sfn "${SLIC3R_RESOURCES_DIR}" "${BIN_RESOURCES_DIR}"
+         COMMENT "Symlinking the resources directory into the build tree"
+         VERBATIM)
+-    add_custom_command(TARGET OrcaSlicer POST_BUILD
+-        COMMAND ${CMAKE_COMMAND} -E rm -rf "${BIN_DIR}/python"
+-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_PREFIX_PATH}/libpython" "${BIN_DIR}/python"
+-        COMMENT "Copying Python runtime into the build tree"
+-        VERBATIM)
++    if(NOT SYS_LIB_PYTHON3)
++        add_custom_command(TARGET OrcaSlicer POST_BUILD
++            COMMAND ${CMAKE_COMMAND} -E rm -rf "${BIN_DIR}/python"
++            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_PREFIX_PATH}/libpython" "${BIN_DIR}/python"
++            COMMENT "Copying Python runtime into the build tree"
++            VERBATIM)
++    endif()
+     # Stage uv next to the binary for the build-tree/.app flows, which never
+     # run install() -- see the layout map above; lookup is bundled_uv_path().
+     if(ORCA_BUNDLED_UV_EXECUTABLE AND EXISTS "${ORCA_BUNDLED_UV_EXECUTABLE}")
 diff --git a/src/libslic3r/CMakeLists.txt b/src/libslic3r/CMakeLists.txt
-index 9b67d7ab50..eea68c983a 100644
+index 2880a3cc6b..dc103da7d8 100644
 --- a/src/libslic3r/CMakeLists.txt
 +++ b/src/libslic3r/CMakeLists.txt
-@@ -489,7 +489,7 @@ add_library(libslic3r STATIC ${lisbslic3r_sources}
+@@ -511,7 +511,7 @@ add_library(libslic3r STATIC ${lisbslic3r_sources}
      ${OpenVDBUtils_SOURCES})
  source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${lisbslic3r_sources})
  
@@ -1063,11 +1287,9 @@ index 9b67d7ab50..eea68c983a 100644
      set(CGAL_Boost_USE_STATIC_LIBS ON CACHE BOOL "" FORCE)
  endif ()
  set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON CACHE BOOL "" FORCE)
-@@ -497,8 +497,12 @@ set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON CACHE BOOL "" FORCE)
- cmake_policy(PUSH)
- cmake_policy(SET CMP0011 NEW)
- find_package(CGAL REQUIRED)
--find_package(OpenCV REQUIRED core)
+@@ -526,6 +526,11 @@ find_package(OpenCV REQUIRED core)
+ find_package(assimp REQUIRED)
+ unset(CMAKE_POLICY_DEFAULT_CMP0167)
  cmake_policy(POP)
 +find_package(OpenCV REQUIRED core imgproc imgcodecs)
 +if (SLIC3R_STATIC AND NOT SYS_LIB_OPENCV)
@@ -1077,9 +1299,9 @@ index 9b67d7ab50..eea68c983a 100644
  
  add_library(libslic3r_cgal STATIC
      CutSurface.hpp CutSurface.cpp
-@@ -545,12 +549,21 @@ target_include_directories(libslic3r SYSTEM PUBLIC ${OpenCASCADE_INCLUDE_DIR})
+@@ -575,12 +580,21 @@ target_include_directories(libslic3r SYSTEM PUBLIC ${OpenCASCADE_INCLUDE_DIR})
  find_package(JPEG REQUIRED)
- find_package(draco REQUIRED)
+ find_package(Draco REQUIRED)
  
 -set(OCCT_LIBS
 -    TKXDESTEP
@@ -1105,48 +1327,46 @@ index 9b67d7ab50..eea68c983a 100644
      TKXCAF
      TKXSBase
      TKVCAF
-@@ -581,7 +594,7 @@ target_link_libraries(libslic3r
+@@ -611,7 +625,7 @@ target_link_libraries(libslic3r
          libigl
          libnest2d
          miniz
 -        opencv_world
 +        ${OpenCV_LIBS}
+         assimp::assimp
      PRIVATE
          ${CMAKE_DL_LIBS}
-         ${EXPAT_LIBRARIES}
-diff --git a/src/libslic3r/GCode/PostProcessor.cpp b/src/libslic3r/GCode/PostProcessor.cpp
-index 1e084cd35e..732ce711b1 100644
---- a/src/libslic3r/GCode/PostProcessor.cpp
-+++ b/src/libslic3r/GCode/PostProcessor.cpp
-@@ -11,6 +11,12 @@
- #include <boost/nowide/cstdlib.hpp>
- #include <boost/nowide/convert.hpp>
- #include <boost/nowide/fstream.hpp>
-+#include <boost/process/v1/child.hpp>
-+#include <boost/process/v1/pipe.hpp>
-+#include <boost/process/v1/start_dir.hpp>
-+#include <boost/process/v1/io.hpp>
-+#include <boost/process/v1/handles.hpp>
-+#include <boost/asio.hpp>
+diff --git a/src/libslic3r/Format/OBJ.cpp b/src/libslic3r/Format/OBJ.cpp
+index 50826924f4..84118fd928 100644
+--- a/src/libslic3r/Format/OBJ.cpp
++++ b/src/libslic3r/Format/OBJ.cpp
+@@ -10,6 +10,8 @@
+ #include <string>
  
- // BBS
- #include <iostream>
-@@ -170,8 +176,8 @@ static int run_script(const std::string &script, const std::string &gcode, std::
+ #include <boost/log/trivial.hpp>
++#include <boost/nowide/iostream.hpp>
++#include <boost/nowide/fstream.hpp>
  
-     BOOST_LOG_TRIVIAL(debug) << boost::format("Executing script, shell: %1%, command: %2%") % shell % command;
- 
--    process::ipstream istd_err;
--    process::child child(shell, "-c", command, process::std_err > istd_err);
-+    process::v1::ipstream istd_err;
-+    process::v1::child child(shell, "-c", command, process::v1::std_err > istd_err);
- 
-     std_err.clear();
-     std::string line;
+ #ifdef _WIN32
+ #define DIR_SEPARATOR '\\'
+diff --git a/src/libslic3r/utils.cpp b/src/libslic3r/utils.cpp
+index 58ec8318a6..f9260ec15b 100644
+--- a/src/libslic3r/utils.cpp
++++ b/src/libslic3r/utils.cpp
+@@ -921,7 +921,7 @@ CopyFileResult copy_file_inner(const std::string& from, const std::string& to, s
+ 	// That may happen when copying on some exotic file system, for example Linux on Chrome.
+ 	copy_file_linux(source, target, ec);
+ #else // __linux__
+-	boost::filesystem::copy_file(source, target, boost::filesystem::copy_option::overwrite_if_exists, ec);
++	boost::filesystem::copy_file(source, target, boost::filesystem::copy_options::overwrite_existing, ec);
+ #endif // __linux__
+ 	if (ec) {
+ 		error_message = ec.message();
 diff --git a/src/slic3r/CMakeLists.txt b/src/slic3r/CMakeLists.txt
-index 969dcb693a..792d8a7959 100644
+index b014b44bb2..1f32f5bbb4 100644
 --- a/src/slic3r/CMakeLists.txt
 +++ b/src/slic3r/CMakeLists.txt
-@@ -816,7 +816,7 @@ if (UNIX AND NOT APPLE)
+@@ -921,7 +921,7 @@ if (UNIX AND NOT APPLE)
      find_package(GTK${SLIC3R_GTK} REQUIRED)
      pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
      pkg_check_modules(webkit2gtk REQUIRED webkit2gtk-4.1)
@@ -1168,11 +1388,32 @@ index 092594ce51..f53fbbea2c 100644
  #include <boost/nowide/fstream.hpp>
  
  #include "libslic3r/libslic3r.h"
+diff --git a/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp b/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp
+index b86d3cde98..6bc3a1808a 100644
+--- a/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp
++++ b/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp
+@@ -1,6 +1,7 @@
+ #include "DevConfigUtil.h"
+ 
+ #include <wx/dir.h>
++#include <boost/filesystem.hpp>
+ #include <boost/filesystem/operations.hpp>
+ #include "../I18N.hpp"
+ 
+@@ -274,7 +275,7 @@ std::map<std::string, std::vector<std::string>> DevPrinterConfigUtil::get_all_su
+         for (const auto& entry : boost::filesystem::directory_iterator(from_dir))
+         {
+             const boost::filesystem::path& file_path = entry.path();
+-            if (boost::filesystem::is_regular_file(file_path) && file_path.extension() == ".json")
++        if (boost::filesystem::is_regular_file(file_path) && file_path.extension() == ".json")
+             {
+                 try
+                 {
 diff --git a/src/slic3r/GUI/GUI_App.cpp b/src/slic3r/GUI/GUI_App.cpp
-index b6ab6dc706..83201bcd3e 100644
+index 738af5e24c..e3c4dd7463 100644
 --- a/src/slic3r/GUI/GUI_App.cpp
 +++ b/src/slic3r/GUI/GUI_App.cpp
-@@ -8398,7 +8398,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
+@@ -8982,7 +8982,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
  
      // Delete the .info file after cloud deletion is confirmed
      if (!preset_file_path.empty() && fs::exists(fs::path(preset_file_path))) {
@@ -1195,10 +1436,10 @@ index 4c0b929663..0976092318 100644
          std::set<std::shared_ptr<session>> sessions;
  
 diff --git a/src/slic3r/GUI/MediaPlayCtrl.cpp b/src/slic3r/GUI/MediaPlayCtrl.cpp
-index 5737484960..5429f287c8 100644
+index 90e956be69..8f5afd5d97 100644
 --- a/src/slic3r/GUI/MediaPlayCtrl.cpp
 +++ b/src/slic3r/GUI/MediaPlayCtrl.cpp
-@@ -16,6 +16,12 @@
+@@ -16,8 +16,14 @@
  #include <boost/nowide/utf8_codecvt.hpp>
  #undef pid_t
  #include <boost/process.hpp>
@@ -1209,9 +1450,12 @@ index 5737484960..5429f287c8 100644
 +#include <boost/process/v1/handles.hpp>
 +#include <boost/asio.hpp>
  #ifdef __WIN32__
- #include <boost/process/windows.hpp>
+-#include <boost/process/windows.hpp>
++#include <boost/process/v1/windows.hpp>
  #else
-@@ -764,7 +770,7 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
+ #include <sys/ipc.h>
+ #include <sys/shm.h>
+@@ -761,7 +767,7 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
          std::vector<std::string> configss;
          boost::algorithm::split(configss, configs, boost::algorithm::is_any_of("\r\n"));
          configss.erase(std::remove(configss.begin(), configss.end(), std::string()), configss.end());
@@ -1220,17 +1464,20 @@ index 5737484960..5429f287c8 100644
          boost::filesystem::path start_dir(boost::filesystem::path(data_dir()) / "plugins");
  #ifdef __WXMSW__
          auto plugins_dir = boost::nowide::widen(data_dir()) + L"\\plugins\\";
-@@ -774,17 +780,17 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
+@@ -771,17 +777,17 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
              if (!boost::filesystem::exists(file_dll) || boost::filesystem::last_write_time(file_dll) != boost::filesystem::last_write_time(file_dll2))
                  boost::filesystem::copy_file(file_dll2, file_dll, boost::filesystem::copy_options::overwrite_existing);
          }
 -        boost::process::child process_source(file_source, file_url2.ToStdWstring(), boost::process::start_dir(tools_dir), 
-+        boost::process::v1::child process_source(file_source, file_url2.ToStdWstring(), boost::process::start_dir(tools_dir),
-                                              boost::process::windows::create_no_window, 
-                                              boost::process::std_out > intermediate, boost::process::limit_handles);
+-                                             boost::process::windows::create_no_window, 
+-                                             boost::process::std_out > intermediate, boost::process::limit_handles);
 -        boost::process::child process_ffmpeg(file_ffmpeg, configss, boost::process::windows::create_no_window, 
-+        boost::process::v1::child process_ffmpeg(file_ffmpeg, configss, boost::process::windows::create_no_window,
-                                              boost::process::std_in < intermediate, boost::process::limit_handles);
+-                                             boost::process::std_in < intermediate, boost::process::limit_handles);
++        boost::process::v1::child process_source(file_source, file_url2.ToStdWstring(), boost::process::v1::start_dir(tools_dir),
++                                             boost::process::v1::windows::create_no_window, 
++                                             boost::process::v1::std_out > intermediate, boost::process::v1::limit_handles);
++        boost::process::v1::child process_ffmpeg(file_ffmpeg, configss, boost::process::v1::windows::create_no_window,
++                                             boost::process::v1::std_in < intermediate, boost::process::v1::limit_handles);
  #else
          boost::filesystem::permissions(file_source, boost::filesystem::owner_exe | boost::filesystem::add_perms);
          boost::filesystem::permissions(file_ffmpeg, boost::filesystem::owner_exe | boost::filesystem::add_perms);
@@ -1243,8 +1490,91 @@ index 5737484960..5429f287c8 100644
  #endif
          process_source.detach();
          process_ffmpeg.detach();
+diff --git a/src/slic3r/GUI/PostProcessor.cpp b/src/slic3r/GUI/PostProcessor.cpp
+index cd8592c813..3e00da768f 100644
+--- a/src/slic3r/GUI/PostProcessor.cpp
++++ b/src/slic3r/GUI/PostProcessor.cpp
+@@ -19,6 +19,8 @@
+ #include <boost/nowide/cstdlib.hpp>
+ #include <boost/nowide/convert.hpp>
+ #include <boost/nowide/fstream.hpp>
++#include <boost/process/v1.hpp>
++#include <boost/asio.hpp>
+ 
+ // BBS
+ #include <algorithm>
+@@ -165,9 +167,9 @@ static int run_script(const std::string& script, const std::string& gcode, std::
+ // POSIX
+ 
+ #include <cstdlib> // getenv()
+-#include <boost/process.hpp>
++#include <boost/process/v1.hpp>
+ 
+-namespace process = boost::process;
++namespace process = boost::process::v1;
+ 
+ static int run_script(const std::string& script, const std::string& gcode, std::string& std_err)
+ {
+diff --git a/src/slic3r/GUI/ProcessRunner.cpp b/src/slic3r/GUI/ProcessRunner.cpp
+index 77b296fc25..43a5aece90 100644
+--- a/src/slic3r/GUI/ProcessRunner.cpp
++++ b/src/slic3r/GUI/ProcessRunner.cpp
+@@ -1,6 +1,6 @@
+ #include "ProcessRunner.hpp"
+ 
+-#include <boost/process/env.hpp>
++#include <boost/process/v1/env.hpp>
+ #include <boost/process.hpp>
+ #ifdef _WIN32
+ #include <boost/process/windows.hpp>
+@@ -127,7 +127,7 @@ bool ProcessRunner::run_command_line_async(const std::string& command_line,
+     m_launching.store(true);
+ 
+     m_launch_thread = std::thread([this, command_line]() {
+-        namespace bp = boost::process;
++        namespace bp = boost::process::v1;
+ 
+         try {
+             auto stdout_pipe = std::make_unique<bp::ipstream>();
+@@ -217,7 +217,7 @@ ProcessRunner::SyncResult ProcessRunner::run_sync(const std::string& executable,
+     SyncResult result;
+ 
+     try {
+-        namespace bp = boost::process;
++        namespace bp = boost::process::v1;
+ 
+         bp::ipstream std_out;
+         bp::ipstream std_err;
+diff --git a/src/slic3r/GUI/ProcessRunner.hpp b/src/slic3r/GUI/ProcessRunner.hpp
+index e07ec1af95..7bdfc94235 100644
+--- a/src/slic3r/GUI/ProcessRunner.hpp
++++ b/src/slic3r/GUI/ProcessRunner.hpp
+@@ -12,7 +12,7 @@
+ #include <vector>
+ #include <functional>
+ 
+-#include <boost/process.hpp>
++#include <boost/process/v1.hpp>
+ 
+ namespace Slic3r { namespace GUI {
+ 
+@@ -79,10 +79,10 @@ private:
+     std::mutex       m_output_mutex;
+     std::vector<OutputLine> m_output_queue;
+ 
+-    std::unique_ptr<boost::process::child> m_process;
+-    std::unique_ptr<boost::process::ipstream> m_stdout_pipe;
+-    std::unique_ptr<boost::process::ipstream> m_stderr_pipe;
+-    std::unique_ptr<boost::process::opstream> m_stdin_pipe;
++    std::unique_ptr<boost::process::v1::child> m_process;
++    std::unique_ptr<boost::process::v1::ipstream> m_stdout_pipe;
++    std::unique_ptr<boost::process::v1::ipstream> m_stderr_pipe;
++    std::unique_ptr<boost::process::v1::opstream> m_stdin_pipe;
+ 
+     OutputCallback m_on_output;
+     DoneCallback m_on_done;
 diff --git a/src/slic3r/GUI/RemovableDriveManager.cpp b/src/slic3r/GUI/RemovableDriveManager.cpp
-index 83ec4695c7..bca6b7b049 100644
+index 83ec4695c7..76874e4995 100644
 --- a/src/slic3r/GUI/RemovableDriveManager.cpp
 +++ b/src/slic3r/GUI/RemovableDriveManager.cpp
 @@ -22,7 +22,9 @@
@@ -1278,8 +1608,17 @@ index 83ec4695c7..bca6b7b049 100644
  #endif
  		std::string line;
  		while (child.running() && std::getline(istd_err, line)) {
+@@ -324,7 +326,7 @@ void RemovableDriveManager::eject_drive()
+             // The wait call can fail
+             // It can happen even in cases where the eject is sucessful, but better report it as failed.
+             // We did not find a way to reliably retrieve the exit code of the process.
+-			BOOST_LOG_TRIVIAL(error) << "boost::process::child::wait() failed during Ejection. State of Ejection is unknown. Error code: " << ec.value();
++			BOOST_LOG_TRIVIAL(error) << "boost::process::v1::child::wait() failed during Ejection. State of Ejection is unknown. Error code: " << ec.value();
+ 		} else {
+ 			int err = child.exit_code();
+ 	    	if (err) {
 diff --git a/src/slic3r/GUI/WebUserLoginDialog.cpp b/src/slic3r/GUI/WebUserLoginDialog.cpp
-index 4b8acc9455..edc2fa4381 100644
+index 4222ce745b..e9a4067ce4 100644
 --- a/src/slic3r/GUI/WebUserLoginDialog.cpp
 +++ b/src/slic3r/GUI/WebUserLoginDialog.cpp
 @@ -48,7 +48,7 @@ namespace {
@@ -1292,7 +1631,7 @@ index 4b8acc9455..edc2fa4381 100644
          return static_cast<int>(acceptor.local_endpoint().port());
      } catch (...) {
 diff --git a/src/slic3r/Utils/Bonjour.cpp b/src/slic3r/Utils/Bonjour.cpp
-index 0701695eff..0dce662a0c 100644
+index 0bff5b526c..d5fd00f9b7 100644
 --- a/src/slic3r/Utils/Bonjour.cpp
 +++ b/src/slic3r/Utils/Bonjour.cpp
 @@ -620,7 +620,7 @@ UdpSession::UdpSession(Bonjour::ReplyFn rfn) : replyfn(rfn)
@@ -1459,6 +1798,30 @@ index 50b71791fa..f77a7bba74 100644
  		: UdpSocket(replyfn, multicast_address, io_service)
  		, hostname(hostname)
  
+diff --git a/src/slic3r/Utils/Process.cpp b/src/slic3r/Utils/Process.cpp
+index 518462bbc9..9c0e202543 100644
+--- a/src/slic3r/Utils/Process.cpp
++++ b/src/slic3r/Utils/Process.cpp
+@@ -17,8 +17,8 @@
+ // For starting another OrcaSlicer instance on OSX.
+ // Fails to compile on Windows on the build server.
+ #ifdef __APPLE__
+-    #include <boost/process/spawn.hpp>
+-    #include <boost/process/args.hpp>
++    #include <boost/process/v1/spawn.hpp>
++    #include <boost/process/v1/args.hpp>
+ #endif
+ 
+ #include <wx/stdpaths.h>
+@@ -76,7 +76,7 @@ static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance
+ 				args.emplace_back("--gcodeviewer");
+ 			if (instance_type == NewSlicerInstanceType::Slicer && single_instance)
+ 				args.emplace_back("--single-instance");
+-			boost::process::spawn(bin_path, args);
++			boost::process::v2::spawn(bin_path, args);
+ 		}
+ 		catch (const std::exception& ex) {
+ 			BOOST_LOG_TRIVIAL(error) << "Failed to spawn a new slicer \"" << bin_path.string() << "\": " << ex.what();
 diff --git a/src/slic3r/Utils/Serial.cpp b/src/slic3r/Utils/Serial.cpp
 index 4db1acc6b6..6bf2bb0f26 100644
 --- a/src/slic3r/Utils/Serial.cpp
@@ -1505,3 +1868,25 @@ index 25802e3908..63fd0a4b5a 100644
              boost::bind(&TCPConsole::handle_connect, this, boost::placeholders::_1)
          );
  
+diff --git a/src/slic3r/plugin/PluginLoader.cpp b/src/slic3r/plugin/PluginLoader.cpp
+index 92fe92068f..acbfb946da 100644
+--- a/src/slic3r/plugin/PluginLoader.cpp
++++ b/src/slic3r/plugin/PluginLoader.cpp
+@@ -13,7 +13,7 @@
+ #include <boost/algorithm/string.hpp>
+ #include <boost/filesystem.hpp>
+ #include <boost/log/trivial.hpp>
+-#include <boost/process.hpp>
++#include <boost/process/v1.hpp>
+ #ifdef _WIN32
+ #include <boost/process/windows.hpp>
+ #endif
+@@ -455,7 +455,7 @@ bool install_packages(const std::vector<std::string>& pkgs, std::string& error)
+                             << boost::algorithm::join(pkgs, ", ");
+ 
+     try {
+-        namespace process = boost::process;
++        namespace process = boost::process::v1;
+ 
+         process::ipstream std_err;
+         process::child    child(uv_path, process::args(args),

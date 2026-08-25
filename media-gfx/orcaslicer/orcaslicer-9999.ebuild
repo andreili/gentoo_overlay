@@ -10,6 +10,8 @@ EIGEN_VER="5.0.1"
 EIGEN_FN="eigen-${EIGEN_VER}.zip"
 NOISE_VER="1.0"
 NOISE_FN="libnoise-${NOISE_VER}.zip"
+WXINS_VER="1.0.0"
+WXINS_FN="wxInspector-${WXINS_VER}.zip"
 
 DESCRIPTION="G-code generator for 3D printers (Bambu, Prusa, Voron, VzBot, RatRig, Creality, etc.)"
 HOMEPAGE="https://www.orcaslicer.com/"
@@ -20,7 +22,8 @@ if [[ ${PV} == 9999 ]]; then
     SRC_URI="https://github.com/google/draco/archive/refs/tags/${DRACO_VER}.zip -> ${DRACO_FN}
 	     https://github.com/CGAL/cgal/releases/download/v${CGAL_VER}/${CGAL_FN}
 	     https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_VER}/${EIGEN_FN}
-	     https://github.com/SoftFever/Orca-deps-libnoise/archive/refs/tags/${NOISE_VER}.zip -> ${NOISE_FN}"
+	     https://github.com/SoftFever/Orca-deps-libnoise/archive/refs/tags/${NOISE_VER}.zip -> ${NOISE_FN}
+	     https://github.com/Noisyfox/wxInspector/archive/refs/tags/v${WXINS_VER}.zip -> ${WXINS_FN}"
     KEYWORDS=""
     S="${WORKDIR}/orcaslicer-${PV}"
 else
@@ -68,6 +71,7 @@ DEPEND="
     media-libs/nanosvg
     dev-cpp/nlohmann_json
     media-libs/openexr
+    media-libs/assimp
 "
 RDEPEND="
     ${DEPEND}
@@ -98,6 +102,8 @@ src_compile() {
     cp "${DISTDIR}/${EIGEN_FN}" "${S}/deps/DL_CACHE/Eigen/${EIGEN_FN}"
     mkdir -p "${S}/deps/DL_CACHE/libnoise"
     cp "${DISTDIR}/${NOISE_FN}" "${S}/deps/DL_CACHE/libnoise/${NOISE_VER}.zip"
+    mkdir -p "${S}/deps/DL_CACHE/wxInspector"
+    cp "${DISTDIR}/${WXINS_FN}" "${S}/deps/DL_CACHE/wxInspector/v${WXINS_VER}.zip"
     cmake_run_in ${S} cmake -S ${S}/deps -B deps/${P}_build -Wno-dev -DSYS_LIBS=all || die
     cmake_run_in ${S} cmake --build deps/${P}_build -j1 || die
 
@@ -106,8 +112,6 @@ src_compile() {
 	-DSLIC3R_STATIC=OFF
 	-DSLIC3R_FHS=1
 	-DSLIC3R_PCH=0
-	-DBBL_RELEASE_TO_PUBLIC=1
-	-DBBL_INTERNAL_TESTING=0
 	
 	-DORCA_TOOLS=ON
 	-DUSE_BLOSC=TRUE
