@@ -17,4 +17,5 @@ RDEPEND="
 	media-video/ffmpeg[jpeg2k,nvenc,openh264,theora,vorbis,x264,x265]
 	media-libs/libjpeg-turbo
 	sys-apps/nvme-cli
+	app-misc/zigbee2mqtt
 "
