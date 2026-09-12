@@ -72,6 +72,7 @@ DEPEND="
     dev-cpp/nlohmann_json
     media-libs/openexr
     media-libs/assimp
+    media-video/ffmpeg
 "
 RDEPEND="
     ${DEPEND}

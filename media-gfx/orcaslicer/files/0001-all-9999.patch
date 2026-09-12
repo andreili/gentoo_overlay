@@ -9,10 +9,10 @@ index c850d0ea10..6abaa1baf4 100644
 +        echo "sudo chown $USER -R ./"
          sudo chown $USER -R ./
 diff --git a/.github/workflows/build_check_cache.yml b/.github/workflows/build_check_cache.yml
-index b5c5b28b95..f530949a44 100644
+index 91ea51ac60..a7ed7d45d5 100644
 --- a/.github/workflows/build_check_cache.yml
 +++ b/.github/workflows/build_check_cache.yml
-@@ -19,7 +19,7 @@ on:
+@@ -23,7 +23,7 @@ on:
  jobs:
    check_cache: # determines if there is a cache and outputs variables used in caching process
      name: Check Cache
@@ -22,10 +22,10 @@ index b5c5b28b95..f530949a44 100644
        cache-key: ${{ steps.set_outputs.outputs.cache-key }}
        cache-path: ${{ steps.set_outputs.outputs.cache-path }}
 diff --git a/.github/workflows/build_deps.yml b/.github/workflows/build_deps.yml
-index 9927f5bef6..40b23dd85f 100644
+index f7082a8a06..40e2d20ae3 100644
 --- a/.github/workflows/build_deps.yml
 +++ b/.github/workflows/build_deps.yml
-@@ -27,7 +27,7 @@ jobs:
+@@ -31,7 +31,7 @@ jobs:
    build_deps:
      name: Build Deps
      if: ${{ !cancelled() && (inputs.build-deps-only || inputs.force-build || inputs.valid-cache != true) }}
@@ -35,10 +35,10 @@ index 9927f5bef6..40b23dd85f 100644
        date:
      steps:
 diff --git a/.github/workflows/build_orca.yml b/.github/workflows/build_orca.yml
-index 112c0b279b..381b93f8ba 100644
+index 1b7fd37a0f..52d0cbe62f 100644
 --- a/.github/workflows/build_orca.yml
 +++ b/.github/workflows/build_orca.yml
-@@ -21,7 +21,7 @@ on:
+@@ -25,7 +25,7 @@ on:
  jobs:
    build_orca:
      name: Build OrcaSlicer
@@ -61,10 +61,10 @@ index fabca4bc37..f116a22099 100644
        - name: Checkout repository
          uses: actions/checkout@v7
 diff --git a/.github/workflows/check_profiles.yml b/.github/workflows/check_profiles.yml
-index db3ae6c4e8..506959739d 100644
+index b855d09da7..6d4352ea7f 100644
 --- a/.github/workflows/check_profiles.yml
 +++ b/.github/workflows/check_profiles.yml
-@@ -27,7 +27,7 @@ jobs:
+@@ -31,7 +31,7 @@ jobs:
      # This job name is the check-run name pr-merge-bot.yml requires before a
      # delegated merge. Renaming it silently disables that gate.
      name: Check profiles
@@ -100,7 +100,7 @@ index a8c21edd01..3369126c2c 100644
      permissions:
        contents: read
 diff --git a/.github/workflows/pr-label-bot.yml b/.github/workflows/pr-label-bot.yml
-index 1214db0776..a14045552d 100644
+index fe74841831..8b26006f60 100644
 --- a/.github/workflows/pr-label-bot.yml
 +++ b/.github/workflows/pr-label-bot.yml
 @@ -21,7 +21,7 @@ jobs:
@@ -113,17 +113,17 @@ index 1214db0776..a14045552d 100644
        - name: Ask PR author for label
          uses: actions/github-script@v9
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9f0db669b8..2d9872d0f7 100644
+index 85ee9c4232..40a4f2d340 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -272,6 +272,25 @@ set(SLIC3R_GTK "3" CACHE STRING "GTK version to use with wxWidgets on Linux")
+@@ -250,6 +250,25 @@ set(SLIC3R_GTK "3" CACHE STRING "GTK version to use with wxWidgets on Linux")
  
  set(IS_CROSS_COMPILE FALSE)
  
-+option(SYS_LIBS "Compile OrcaSlicer with system libraries, if possible (e.g. 'opencv;openvdb;wxwidgets;boost;tbb;cgal')" ${SYS_LIBS})
++option(SYS_LIBS "Compile OrcaSlicer with system libraries, if possible (e.g. 'opencv;openvdb;wxwidgets;boost;tbb;cgal;ffmpeg')" ${SYS_LIBS})
 +
 +if (SYS_LIBS)
-+    set(SYS_LIBS_ALL "opencv;openvdb;wxwidgets;boost;tbb;cgal;python3")
++    set(SYS_LIBS_ALL "opencv;openvdb;wxwidgets;boost;tbb;cgal;ffmpeg;python3")
 +    if (SYS_LIBS MATCHES "all")
 +        set(SYS_LIBS ${SYS_LIBS_ALL})
 +    endif()
@@ -142,7 +142,7 @@ index 9f0db669b8..2d9872d0f7 100644
  option (COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
  if (${COLORED_OUTPUT})
      if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-@@ -715,7 +734,7 @@ list(REMOVE_DUPLICATES CMAKE_C_FLAGS_RELWITHDEBINFO)
+@@ -724,7 +743,7 @@ list(REMOVE_DUPLICATES CMAKE_C_FLAGS_RELWITHDEBINFO)
  list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS_RELWITHDEBINFO)
  
  # Find and configure boost
@@ -151,7 +151,7 @@ index 9f0db669b8..2d9872d0f7 100644
      # Use static boost libraries.
      set(Boost_USE_STATIC_LIBS ON)
      # Use boost libraries linked statically to the C++ runtime.
-@@ -731,7 +750,12 @@ if(POLICY CMP0167)
+@@ -740,7 +759,12 @@ if(POLICY CMP0167)
    cmake_policy(SET CMP0167 NEW)
  endif()
  set(Boost_NO_SYSTEM_PATHS TRUE)
@@ -165,7 +165,7 @@ index 9f0db669b8..2d9872d0f7 100644
  
  # Find and configure Eigen3
  find_package(Eigen3 5.0.1 REQUIRED)
-@@ -744,7 +768,7 @@ if (APPLE)
+@@ -753,7 +777,7 @@ if (APPLE)
      target_compile_definitions(boost_headeronly INTERFACE BOOST_ASIO_DISABLE_KQUEUE)
  endif()
  
@@ -174,7 +174,7 @@ index 9f0db669b8..2d9872d0f7 100644
      target_compile_definitions(boost_headeronly INTERFACE BOOST_LOG_DYN_LINK)
  endif()
  
-@@ -764,7 +788,7 @@ target_include_directories(boost_headeronly SYSTEM INTERFACE ${Boost_INCLUDE_DIR
+@@ -773,7 +797,7 @@ target_include_directories(boost_headeronly SYSTEM INTERFACE ${Boost_INCLUDE_DIR
  target_link_libraries(boost_libs INTERFACE boost_headeronly ${Boost_LIBRARIES})
  
  # Find and configure intel-tbb
@@ -183,7 +183,7 @@ index 9f0db669b8..2d9872d0f7 100644
      set(TBB_STATIC 1)
  endif()
  set(TBB_DEBUG 1)
-@@ -899,13 +923,22 @@ endforeach()
+@@ -908,13 +932,22 @@ endforeach()
  find_package(NLopt 1.4 REQUIRED)
  
  # Use bundled Python from deps instead of system Python
@@ -211,7 +211,7 @@ index 9f0db669b8..2d9872d0f7 100644
  set(Python3_FIND_IMPLEMENTATIONS CPython)
  
  if(WIN32)
-@@ -979,14 +1012,19 @@ target_compile_definitions(pybind11_embed INTERFACE PYBIND11_SIMPLE_GIL_MANAGEME
+@@ -988,14 +1021,19 @@ target_compile_definitions(pybind11_embed INTERFACE PYBIND11_SIMPLE_GIL_MANAGEME
  add_library(pybind11::embed ALIAS pybind11_embed)
  
  
@@ -233,6 +233,55 @@ index 9f0db669b8..2d9872d0f7 100644
      slic3r_remap_configs(Blosc::blosc RelWithDebInfo Release)
  else ()
      message(FATAL_ERROR "OpenVDB could not be found with the bundled find module. "
+@@ -1199,6 +1237,39 @@ function(orcaslicer_silence_third_party_warnings _dir)
+ endfunction()
+ 
+ 
++# Bundled sources set their own warning flags, and a plain -Wall there means /Wall
++# (= -Weverything) under clang-cl. Target options are applied after the ones a target
++# set on itself, so these win. Targets are discovered rather than listed so a newly
++# bundled library needs no maintenance here.
++function(orcaslicer_silence_third_party_warnings _dir)
++    get_property(_subdirs DIRECTORY "${_dir}" PROPERTY SUBDIRECTORIES)
++    foreach (_subdir IN LISTS _subdirs)
++        orcaslicer_silence_third_party_warnings("${_subdir}")
++    endforeach ()
++    get_property(_targets DIRECTORY "${_dir}" PROPERTY BUILDSYSTEM_TARGETS)
++    foreach (_target IN LISTS _targets)
++        get_target_property(_type ${_target} TYPE)
++        if (NOT _type STREQUAL "INTERFACE_LIBRARY" AND NOT _type STREQUAL "UTILITY")
++            if (MSVC AND NOT IS_CLANG_CL)
++                # Drop any level the target set for itself, or -w overrides it and cl
++                # reports D9025 once per file.
++                get_target_property(_opts ${_target} COMPILE_OPTIONS)
++                if (_opts)
++                    string(REGEX REPLACE "/W[0-4]|/Wall" "" _opts "${_opts}")
++                    string(REGEX REPLACE ";;+" ";" _opts "${_opts}")
++                    set_target_properties(${_target} PROPERTIES COMPILE_OPTIONS "${_opts}")
++                endif ()
++                # CMake maps a level into the VS generator's WarningLevel element, while a
++                # bare -w stays on the command line and trips D9025 there, once per file.
++                target_compile_options(${_target} PRIVATE /W0)
++            else ()
++                target_compile_options(${_target} PRIVATE -w)
++            endif ()
++        endif ()
++    endforeach ()
++endfunction()
++
++
+ # libslic3r, OrcaSlicer GUI and the OrcaSlicer executable.
+ add_subdirectory(deps_src)
+ 
+@@ -1276,7 +1347,7 @@ else ()
+     endif()
+ endif ()
+ 
+-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
++if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT SYS_LIB_FFMPEG)
+     set(LIBRARY_FILES
+     ${LIBDIR_BIN}/libavcodec.so.61
+     ${LIBDIR_BIN}/libavcodec.so.61.3.100
 diff --git a/cmake/modules/FindBlosc.cmake b/cmake/modules/FindBlosc.cmake
 new file mode 100644
 index 0000000000..e12c0c386d
@@ -716,10 +765,10 @@ index d2e101a0a6..df581df243 100644
  set(_OPENVDB_DEFINITIONS)
  if(OpenVDB_ABI)
 diff --git a/deps/Boost/Boost.cmake b/deps/Boost/Boost.cmake
-index bdd801857e..d6e1e2b2f8 100644
+index 08b62b9fb8..2b47b969ea 100644
 --- a/deps/Boost/Boost.cmake
 +++ b/deps/Boost/Boost.cmake
-@@ -26,8 +26,8 @@ endif ()
+@@ -33,8 +33,8 @@ endif ()
  
  orcaslicer_add_cmake_project(Boost
      ${_options}
@@ -731,10 +780,10 @@ index bdd801857e..d6e1e2b2f8 100644
      CMAKE_ARGS
          -DBOOST_EXCLUDE_LIBRARIES:STRING=contract|fiber|numpy|stacktrace|wave|test
 diff --git a/deps/CMakeLists.txt b/deps/CMakeLists.txt
-index 8f4bc2a215..6cad9b5456 100644
+index ed3af70d03..6ff7aa7465 100644
 --- a/deps/CMakeLists.txt
 +++ b/deps/CMakeLists.txt
-@@ -111,6 +111,69 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+@@ -111,6 +111,70 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
      option(DEP_WX_GTK3 "Build wxWidgets against GTK3" ON)
  endif()
  
@@ -773,6 +822,7 @@ index 8f4bc2a215..6cad9b5456 100644
 +    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};boost")
 +    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};python3")
 +    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};assimp")
++    set(SYS_LIBS_ALL "${SYS_LIBS_ALL};ffmpeg")
 +    if (SYS_LIBS MATCHES "all")
 +        set(SYS_LIBS ${SYS_LIBS_ALL})
 +    endif()
@@ -804,7 +854,7 @@ index 8f4bc2a215..6cad9b5456 100644
  set(IS_CROSS_COMPILE FALSE)
  
  if (APPLE)
-@@ -318,57 +381,189 @@ if(FLATPAK)
+@@ -326,57 +390,197 @@ if(FLATPAK)
      find_package(EXPAT)
      find_package(CURL)
      find_package(JPEG)
@@ -932,7 +982,10 @@ index 8f4bc2a215..6cad9b5456 100644
 +    message(STATUS "Using TBB from source.")
 +    include(TBB/TBB.cmake)
 +endif()
-+
+ 
+-include(GMP/GMP.cmake)
+-include(MPFR/MPFR.cmake)
+-include(Eigen/Eigen.cmake)
 +find_package(Blosc QUIET)
 +if(Blosc_FOUND AND SYS_LIB_BLOSC)
 +    message(STATUS "Using Blosc from system.")
@@ -941,10 +994,7 @@ index 8f4bc2a215..6cad9b5456 100644
 +    message(STATUS "Using Blosc from source.")
 +    include(Blosc/Blosc.cmake)
 +endif()
- 
--include(GMP/GMP.cmake)
--include(MPFR/MPFR.cmake)
--include(Eigen/Eigen.cmake)
++
 +find_package(OpenEXR QUIET)
 +if(OpenEXR_FOUND AND SYS_LIB_OPENEXR)
 +    message(STATUS "Using OpenEXR from system.")
@@ -1006,8 +1056,17 @@ index 8f4bc2a215..6cad9b5456 100644
  
  include(Draco/Draco.cmake)
  
- # Assimp: glTF/GLB/FBX import for the texture-to-color feature.
+-include(FFMPEG/FFMPEG.cmake)
 -include(Assimp/Assimp.cmake)
++find_library(FFMPEG_LIBRARY NAMES avcodec avformat avutil QUIET)
++if(FFMPEG_LIBRARY AND SYS_LIB_FFMPEG)
++    message(STATUS "Using FFMPEG from system.")
++    add_library(dep_FFMPEG INTERFACE)
++else()
++    message(STATUS "Using FFMPEG from source.")
++    include(FFMPEG/FFMPEG.cmake)
++endif()
++# Assimp: glTF/GLB/FBX import for the texture-to-color feature.
 +find_package(assimp QUIET)
 +if(assimp_FOUND AND SYS_LIB_ASSIMP)
 +    message(STATUS "Using Assimp from system.")
@@ -1019,7 +1078,7 @@ index 8f4bc2a215..6cad9b5456 100644
  
  
  # I *think* 1.1 is used for *just* md5 hashing?
-@@ -376,7 +571,12 @@ include(Assimp/Assimp.cmake)
+@@ -384,7 +588,12 @@ include(Assimp/Assimp.cmake)
  # a grep across the repo shows it is used for other things
  # TODO: update openssl and everything that uses <openssl/md5.h>
  set(OPENSSL_PKG "")
@@ -1033,7 +1092,7 @@ index 8f4bc2a215..6cad9b5456 100644
      include(OpenSSL/OpenSSL.cmake)
      set(OPENSSL_PKG dep_OpenSSL)
  endif()
-@@ -385,26 +585,49 @@ endif()
+@@ -393,26 +602,49 @@ endif()
  # so, just don't even bother
  # ...i think this is how it works? change if wrong
  set(CURL_PKG "")
@@ -1089,7 +1148,7 @@ index 8f4bc2a215..6cad9b5456 100644
      include(FREETYPE/FREETYPE.cmake)
      set(FREETYPE_PKG "dep_FREETYPE")
  endif()
-@@ -423,9 +646,34 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
+@@ -431,9 +663,34 @@ if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
      file(RELATIVE_PATH BINARY_DIR_REL  ${CMAKE_SOURCE_DIR}/.. ${CMAKE_BINARY_DIR})
  endif ()
  
@@ -1228,10 +1287,10 @@ index a4d71c6f27..d512b20c80 100644
  add_subdirectory(qoi)
  add_subdirectory(semver)      # Semver static library
 diff --git a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
-index d081e2f997..dac1522b3f 100644
+index 00aa430f84..3312882209 100644
 --- a/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
 +++ b/scripts/flatpak/com.orcaslicer.OrcaSlicer.yml
-@@ -182,8 +182,8 @@ modules:
+@@ -183,8 +183,8 @@ modules:
  
        # Boost 1.84.0
        - type: file
@@ -1243,7 +1302,7 @@ index d081e2f997..dac1522b3f 100644
  
        # Eigen 5.0.1
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 0082b29831..24dc004ca0 100644
+index f0de57f12c..0b6c64e6a6 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -22,7 +22,7 @@ if (SLIC3R_GUI)
@@ -1255,7 +1314,30 @@ index 0082b29831..24dc004ca0 100644
              set(wxWidgets_USE_STATIC ON)
          else()
              set(wxWidgets_USE_STATIC OFF)
-@@ -334,11 +334,13 @@ else ()
+@@ -306,13 +306,15 @@ if (WIN32)
+ 
+ else ()
+     if (NOT APPLE)
+-        set(output_sos_Release "")
+-        set(output_sos_Debug "")
+-        add_custom_target(OrcaSlicerSosCopy ALL DEPENDS OrcaSlicer)
+-        if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+-            orcaslicer_copy_sos(OrcaSlicerSosCopy "Debug" "d" output_sos_Debug)
+-        else()
+-            orcaslicer_copy_sos(OrcaSlicerSosCopy "Release" "" output_sos_Release)
++        if (NOT SYS_LIB_FFMPEG)
++            set(output_sos_Release "")
++            set(output_sos_Debug "")
++            add_custom_target(OrcaSlicerSosCopy ALL DEPENDS OrcaSlicer)
++            if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
++                orcaslicer_copy_sos(OrcaSlicerSosCopy "Debug" "d" output_sos_Debug)
++            else()
++                orcaslicer_copy_sos(OrcaSlicerSosCopy "Release" "" output_sos_Release)
++            endif()
+         endif()
+     endif()
+     if (APPLE AND NOT CMAKE_MACOSX_BUNDLE)
+@@ -355,11 +357,13 @@ else ()
          COMMAND ln -sfn "${SLIC3R_RESOURCES_DIR}" "${BIN_RESOURCES_DIR}"
          COMMENT "Symlinking the resources directory into the build tree"
          VERBATIM)
@@ -1275,10 +1357,10 @@ index 0082b29831..24dc004ca0 100644
      # run install() -- see the layout map above; lookup is bundled_uv_path().
      if(ORCA_BUNDLED_UV_EXECUTABLE AND EXISTS "${ORCA_BUNDLED_UV_EXECUTABLE}")
 diff --git a/src/libslic3r/CMakeLists.txt b/src/libslic3r/CMakeLists.txt
-index 2880a3cc6b..dc103da7d8 100644
+index ffc6b5cee6..a1d6cf634e 100644
 --- a/src/libslic3r/CMakeLists.txt
 +++ b/src/libslic3r/CMakeLists.txt
-@@ -511,7 +511,7 @@ add_library(libslic3r STATIC ${lisbslic3r_sources}
+@@ -517,7 +517,7 @@ add_library(libslic3r STATIC ${lisbslic3r_sources}
      ${OpenVDBUtils_SOURCES})
  source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${lisbslic3r_sources})
  
@@ -1287,7 +1369,7 @@ index 2880a3cc6b..dc103da7d8 100644
      set(CGAL_Boost_USE_STATIC_LIBS ON CACHE BOOL "" FORCE)
  endif ()
  set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON CACHE BOOL "" FORCE)
-@@ -526,6 +526,11 @@ find_package(OpenCV REQUIRED core)
+@@ -532,6 +532,11 @@ find_package(OpenCV REQUIRED core)
  find_package(assimp REQUIRED)
  unset(CMAKE_POLICY_DEFAULT_CMP0167)
  cmake_policy(POP)
@@ -1299,7 +1381,7 @@ index 2880a3cc6b..dc103da7d8 100644
  
  add_library(libslic3r_cgal STATIC
      CutSurface.hpp CutSurface.cpp
-@@ -575,12 +580,21 @@ target_include_directories(libslic3r SYSTEM PUBLIC ${OpenCASCADE_INCLUDE_DIR})
+@@ -587,12 +592,21 @@ target_include_directories(libslic3r SYSTEM PUBLIC ${OpenCASCADE_INCLUDE_DIR})
  find_package(JPEG REQUIRED)
  find_package(Draco REQUIRED)
  
@@ -1327,7 +1409,7 @@ index 2880a3cc6b..dc103da7d8 100644
      TKXCAF
      TKXSBase
      TKVCAF
-@@ -611,7 +625,7 @@ target_link_libraries(libslic3r
+@@ -623,7 +637,7 @@ target_link_libraries(libslic3r
          libigl
          libnest2d
          miniz
@@ -1337,23 +1419,22 @@ index 2880a3cc6b..dc103da7d8 100644
      PRIVATE
          ${CMAKE_DL_LIBS}
 diff --git a/src/libslic3r/Format/OBJ.cpp b/src/libslic3r/Format/OBJ.cpp
-index 50826924f4..84118fd928 100644
+index 10abe8e4de..a145a69297 100644
 --- a/src/libslic3r/Format/OBJ.cpp
 +++ b/src/libslic3r/Format/OBJ.cpp
-@@ -10,6 +10,8 @@
+@@ -10,6 +10,7 @@
  #include <string>
  
  #include <boost/log/trivial.hpp>
 +#include <boost/nowide/iostream.hpp>
-+#include <boost/nowide/fstream.hpp>
+ #include <boost/nowide/fstream.hpp>
  
  #ifdef _WIN32
- #define DIR_SEPARATOR '\\'
 diff --git a/src/libslic3r/utils.cpp b/src/libslic3r/utils.cpp
-index 58ec8318a6..f9260ec15b 100644
+index 58323b29ce..0d15fb1bcc 100644
 --- a/src/libslic3r/utils.cpp
 +++ b/src/libslic3r/utils.cpp
-@@ -921,7 +921,7 @@ CopyFileResult copy_file_inner(const std::string& from, const std::string& to, s
+@@ -925,7 +925,7 @@ CopyFileResult copy_file_inner(const std::string& from, const std::string& to, s
  	// That may happen when copying on some exotic file system, for example Linux on Chrome.
  	copy_file_linux(source, target, ec);
  #else // __linux__
@@ -1363,10 +1444,10 @@ index 58ec8318a6..f9260ec15b 100644
  	if (ec) {
  		error_message = ec.message();
 diff --git a/src/slic3r/CMakeLists.txt b/src/slic3r/CMakeLists.txt
-index b014b44bb2..1f32f5bbb4 100644
+index 691675a452..25717889cb 100644
 --- a/src/slic3r/CMakeLists.txt
 +++ b/src/slic3r/CMakeLists.txt
-@@ -921,7 +921,7 @@ if (UNIX AND NOT APPLE)
+@@ -965,7 +965,7 @@ if (UNIX AND NOT APPLE)
      find_package(GTK${SLIC3R_GTK} REQUIRED)
      pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
      pkg_check_modules(webkit2gtk REQUIRED webkit2gtk-4.1)
@@ -1389,7 +1470,7 @@ index 092594ce51..f53fbbea2c 100644
  
  #include "libslic3r/libslic3r.h"
 diff --git a/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp b/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp
-index b86d3cde98..6bc3a1808a 100644
+index 25008cad29..2ce195a9ee 100644
 --- a/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp
 +++ b/src/slic3r/GUI/DeviceCore/DevConfigUtil.cpp
 @@ -1,6 +1,7 @@
@@ -1400,7 +1481,7 @@ index b86d3cde98..6bc3a1808a 100644
  #include <boost/filesystem/operations.hpp>
  #include "../I18N.hpp"
  
-@@ -274,7 +275,7 @@ std::map<std::string, std::vector<std::string>> DevPrinterConfigUtil::get_all_su
+@@ -277,7 +278,7 @@ std::map<std::string, std::vector<std::string>> DevPrinterConfigUtil::get_all_su
          for (const auto& entry : boost::filesystem::directory_iterator(from_dir))
          {
              const boost::filesystem::path& file_path = entry.path();
@@ -1410,10 +1491,10 @@ index b86d3cde98..6bc3a1808a 100644
                  try
                  {
 diff --git a/src/slic3r/GUI/GUI_App.cpp b/src/slic3r/GUI/GUI_App.cpp
-index 738af5e24c..e3c4dd7463 100644
+index 966cf49013..ca88d28c62 100644
 --- a/src/slic3r/GUI/GUI_App.cpp
 +++ b/src/slic3r/GUI/GUI_App.cpp
-@@ -8982,7 +8982,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
+@@ -8777,7 +8777,7 @@ void GUI_App::preset_deleted_from_cloud(std::string setting_id)
  
      // Delete the .info file after cloud deletion is confirmed
      if (!preset_file_path.empty() && fs::exists(fs::path(preset_file_path))) {
@@ -1436,10 +1517,10 @@ index 4c0b929663..0976092318 100644
          std::set<std::shared_ptr<session>> sessions;
  
 diff --git a/src/slic3r/GUI/MediaPlayCtrl.cpp b/src/slic3r/GUI/MediaPlayCtrl.cpp
-index 90e956be69..8f5afd5d97 100644
+index 557d859cf7..1cd6d2717a 100644
 --- a/src/slic3r/GUI/MediaPlayCtrl.cpp
 +++ b/src/slic3r/GUI/MediaPlayCtrl.cpp
-@@ -16,8 +16,14 @@
+@@ -22,8 +22,14 @@
  #include <boost/nowide/utf8_codecvt.hpp>
  #undef pid_t
  #include <boost/process.hpp>
@@ -1455,7 +1536,7 @@ index 90e956be69..8f5afd5d97 100644
  #else
  #include <sys/ipc.h>
  #include <sys/shm.h>
-@@ -761,7 +767,7 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
+@@ -763,7 +769,7 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
          std::vector<std::string> configss;
          boost::algorithm::split(configss, configs, boost::algorithm::is_any_of("\r\n"));
          configss.erase(std::remove(configss.begin(), configss.end(), std::string()), configss.end());
@@ -1464,24 +1545,11 @@ index 90e956be69..8f5afd5d97 100644
          boost::filesystem::path start_dir(boost::filesystem::path(data_dir()) / "plugins");
  #ifdef __WXMSW__
          auto plugins_dir = boost::nowide::widen(data_dir()) + L"\\plugins\\";
-@@ -771,17 +777,17 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
-             if (!boost::filesystem::exists(file_dll) || boost::filesystem::last_write_time(file_dll) != boost::filesystem::last_write_time(file_dll2))
-                 boost::filesystem::copy_file(file_dll2, file_dll, boost::filesystem::copy_options::overwrite_existing);
-         }
--        boost::process::child process_source(file_source, file_url2.ToStdWstring(), boost::process::start_dir(tools_dir), 
--                                             boost::process::windows::create_no_window, 
--                                             boost::process::std_out > intermediate, boost::process::limit_handles);
--        boost::process::child process_ffmpeg(file_ffmpeg, configss, boost::process::windows::create_no_window, 
--                                             boost::process::std_in < intermediate, boost::process::limit_handles);
-+        boost::process::v1::child process_source(file_source, file_url2.ToStdWstring(), boost::process::v1::start_dir(tools_dir),
-+                                             boost::process::v1::windows::create_no_window, 
-+                                             boost::process::v1::std_out > intermediate, boost::process::v1::limit_handles);
-+        boost::process::v1::child process_ffmpeg(file_ffmpeg, configss, boost::process::v1::windows::create_no_window,
-+                                             boost::process::v1::std_in < intermediate, boost::process::v1::limit_handles);
+@@ -781,9 +787,9 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
  #else
          boost::filesystem::permissions(file_source, boost::filesystem::owner_exe | boost::filesystem::add_perms);
          boost::filesystem::permissions(file_ffmpeg, boost::filesystem::owner_exe | boost::filesystem::add_perms);
--        boost::process::child process_source(file_source, file_url2.data().AsInternal(), boost::process::start_dir(start_dir), 
+-        boost::process::child process_source(file_source, file_url2.data().AsInternal(), boost::process::start_dir(start_dir),
 -                                             boost::process::std_out > intermediate, boost::process::limit_handles);
 -        boost::process::child process_ffmpeg(file_ffmpeg, configss, boost::process::std_in < intermediate, boost::process::limit_handles);
 +        boost::process::v1::child process_source(file_source, file_url2.data().AsInternal(), boost::process::v1::start_dir(start_dir),
@@ -1618,7 +1686,7 @@ index 83ec4695c7..76874e4995 100644
  			int err = child.exit_code();
  	    	if (err) {
 diff --git a/src/slic3r/GUI/WebUserLoginDialog.cpp b/src/slic3r/GUI/WebUserLoginDialog.cpp
-index 4222ce745b..e9a4067ce4 100644
+index 829e7ef106..0564dfc65d 100644
 --- a/src/slic3r/GUI/WebUserLoginDialog.cpp
 +++ b/src/slic3r/GUI/WebUserLoginDialog.cpp
 @@ -48,7 +48,7 @@ namespace {
@@ -1736,10 +1804,10 @@ index 0bff5b526c..d5fd00f9b7 100644
  		// start io_service, it will run until it has something to do - so in this case until stop is called in timer
  		io_service->run();
 diff --git a/src/slic3r/Utils/Bonjour.hpp b/src/slic3r/Utils/Bonjour.hpp
-index 50b71791fa..f77a7bba74 100644
+index 3ef8f0e1a2..c276a1a329 100644
 --- a/src/slic3r/Utils/Bonjour.hpp
 +++ b/src/slic3r/Utils/Bonjour.hpp
-@@ -151,11 +151,11 @@ public:
+@@ -152,11 +152,11 @@ public:
  	UdpSocket(Bonjour::ReplyFn replyfn
  		, const boost::asio::ip::address& multicast_address
  		, const boost::asio::ip::address& interface_address
@@ -1753,7 +1821,7 @@ index 50b71791fa..f77a7bba74 100644
  
  	void send();
  	void async_receive();
-@@ -168,7 +168,7 @@ protected:
+@@ -169,7 +169,7 @@ protected:
  	boost::asio::ip::address					    multicast_address;
  	boost::asio::ip::udp::socket					socket;
  	boost::asio::ip::udp::endpoint					mcast_endpoint;
@@ -1762,7 +1830,7 @@ index 50b71791fa..f77a7bba74 100644
  	std::vector<BonjourRequest>						requests;
  };
  
-@@ -182,7 +182,7 @@ public:
+@@ -183,7 +183,7 @@ public:
  		, Bonjour::ReplyFn replyfn
  		, const boost::asio::ip::address& multicast_address
  		, const boost::asio::ip::address& interface_address
@@ -1771,7 +1839,7 @@ index 50b71791fa..f77a7bba74 100644
  		: UdpSocket(replyfn, multicast_address, interface_address, io_service)
  		, txt_keys(txt_keys)
  		, service(service)
-@@ -199,7 +199,7 @@ public:
+@@ -200,7 +200,7 @@ public:
  		, std::string protocol
  		, Bonjour::ReplyFn replyfn
  		, const boost::asio::ip::address& multicast_address
@@ -1780,7 +1848,7 @@ index 50b71791fa..f77a7bba74 100644
  		: UdpSocket(replyfn, multicast_address, io_service)
  		, txt_keys(txt_keys)
  		, service(service)
-@@ -237,7 +237,7 @@ public:
+@@ -238,7 +238,7 @@ public:
  		, Bonjour::ReplyFn replyfn
  		, const boost::asio::ip::address& multicast_address
  		, const boost::asio::ip::address& interface_address
@@ -1789,7 +1857,7 @@ index 50b71791fa..f77a7bba74 100644
  		: UdpSocket(replyfn, multicast_address, interface_address, io_service)
  		, hostname(hostname)
  
-@@ -249,7 +249,7 @@ public:
+@@ -250,7 +250,7 @@ public:
  	ResolveSocket(const std::string& hostname
  		, Bonjour::ReplyFn replyfn
  		, const boost::asio::ip::address& multicast_address
@@ -1799,7 +1867,7 @@ index 50b71791fa..f77a7bba74 100644
  		, hostname(hostname)
  
 diff --git a/src/slic3r/Utils/Process.cpp b/src/slic3r/Utils/Process.cpp
-index 518462bbc9..9c0e202543 100644
+index 96da521114..94893a9fff 100644
 --- a/src/slic3r/Utils/Process.cpp
 +++ b/src/slic3r/Utils/Process.cpp
 @@ -17,8 +17,8 @@
@@ -1812,8 +1880,8 @@ index 518462bbc9..9c0e202543 100644
 +    #include <boost/process/v1/args.hpp>
  #endif
  
- #include <wx/stdpaths.h>
-@@ -76,7 +76,7 @@ static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance
+ #include <wx/filename.h>
+@@ -77,7 +77,7 @@ static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance
  				args.emplace_back("--gcodeviewer");
  			if (instance_type == NewSlicerInstanceType::Slicer && single_instance)
  				args.emplace_back("--single-instance");
@@ -1823,7 +1891,7 @@ index 518462bbc9..9c0e202543 100644
  		catch (const std::exception& ex) {
  			BOOST_LOG_TRIVIAL(error) << "Failed to spawn a new slicer \"" << bin_path.string() << "\": " << ex.what();
 diff --git a/src/slic3r/Utils/Serial.cpp b/src/slic3r/Utils/Serial.cpp
-index 4db1acc6b6..6bf2bb0f26 100644
+index f8c03ceb26..17e02103b1 100644
 --- a/src/slic3r/Utils/Serial.cpp
 +++ b/src/slic3r/Utils/Serial.cpp
 @@ -278,11 +278,11 @@ std::vector<std::string> scan_serial_ports()
@@ -1869,7 +1937,7 @@ index 25802e3908..63fd0a4b5a 100644
          );
  
 diff --git a/src/slic3r/plugin/PluginLoader.cpp b/src/slic3r/plugin/PluginLoader.cpp
-index 92fe92068f..acbfb946da 100644
+index 0c45564f1b..a7e9a9e27c 100644
 --- a/src/slic3r/plugin/PluginLoader.cpp
 +++ b/src/slic3r/plugin/PluginLoader.cpp
 @@ -13,7 +13,7 @@
@@ -1890,3 +1958,14 @@ index 92fe92068f..acbfb946da 100644
  
          process::ipstream std_err;
          process::child    child(uv_path, process::args(args),
+diff --git a/tests/libslic3r/test_3mf.cpp b/tests/libslic3r/test_3mf.cpp
+index 5c38859a12..af75edea63 100644
+--- a/tests/libslic3r/test_3mf.cpp
++++ b/tests/libslic3r/test_3mf.cpp
+@@ -1,5 +1,6 @@
+ 
+ #include "libslic3r/Model.hpp"
++#include "libslic3r/TriangleSelector.hpp"
+ #include "libslic3r/Format/3mf.hpp"
+ #include "libslic3r/Format/bbs_3mf.hpp"
+ #include "libslic3r/Format/STL.hpp"
