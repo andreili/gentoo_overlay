@@ -18,4 +18,6 @@ RDEPEND="
 	media-libs/libjpeg-turbo
 	sys-apps/nvme-cli
 	app-misc/zigbee2mqtt
+	sys-apps/usbutils
+	net-firewall/ufw
 "
