@@ -20,4 +20,5 @@ RDEPEND="
 	app-misc/zigbee2mqtt
 	sys-apps/usbutils
 	net-firewall/ufw
+	app-arch/unzip
 "
