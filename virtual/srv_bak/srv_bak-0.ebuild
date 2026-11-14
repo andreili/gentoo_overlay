@@ -6,7 +6,7 @@ KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~loong ~m68k ~mips ppc ppc64 ~riscv 
 
 RDEPEND="net-analyzer/zabbix[agent,-server,-frontend,-mysql]
         net-fs/nfs-utils
-        net-misc/ntp
+        net-misc/clockspeed
         net-misc/networkmanager
         net-vpn/openvpn
         sys-fs/dosfstools

@@ -7,7 +7,6 @@ IUSE=""
 
 RDEPEND="
 	dev-vcs/git
-	dev-embedded/u-boot-tools
 	sys-apps/dtc
 	dev-python/gitpython
 	dev-python/rich

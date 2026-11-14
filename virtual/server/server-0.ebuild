@@ -17,7 +17,7 @@ RDEPEND="
         net-analyzer/zabbix
         net-dns/unbound
         net-fs/nfs-utils
-        net-misc/ntp
+        net-misc/clockspeed
         net-misc/networkmanager
         net-p2p/transmission
         net-vpn/openvpn

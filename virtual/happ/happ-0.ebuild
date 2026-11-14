@@ -7,7 +7,7 @@ KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~loong ~m68k ~mips ppc ppc64 ~riscv 
 RDEPEND="
 	app-admin/sudo
 	net-dns/unbound
-	net-misc/ntp
+	net-misc/chrony
 	net-misc/networkmanager
 	net-vpn/openvpn
 	app-misc/mosquitto[websockets(+)]
