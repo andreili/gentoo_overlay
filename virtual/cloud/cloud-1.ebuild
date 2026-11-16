@@ -17,7 +17,13 @@ RDEPEND="dev-lang/php[curl?,filter,gd,hash(+),intl,json(+),mysql?,pdo,posix,post
 	media-libs/exiftool
 	dev-php/pdlib
 	app-admin/sudo
-	app-misc/mosquitto
 	www-apps/gitea
 	net-firewall/ufw
+	net-vpn/openvpn
+	net-p2p/transmission
+	sys-fs/mdadm
+	www-servers/nginx
+	net-analyzer/zabbix
+	net-dns/unbound
+	sys-apps/smartmontools
 "
