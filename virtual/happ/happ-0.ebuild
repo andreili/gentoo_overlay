@@ -19,5 +19,4 @@ RDEPEND="
 	sys-apps/usbutils
 	net-firewall/ufw
 	app-arch/unzip
-	virtual/system_meta
 "

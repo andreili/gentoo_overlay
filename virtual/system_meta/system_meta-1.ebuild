@@ -16,7 +16,7 @@ RDEPEND="app-editors/nano
 	app-portage/eix
 	app-portage/gentoolkit
 	net-fs/nfs-utils
-	net-misc/clockspeed
+	net-misc/chrony
 	net-misc/networkmanager
 	sys-kernel/genkernel
 	sys-process/htop
