@@ -20,5 +20,4 @@ RDEPEND="dev-lang/php[curl?,filter,gd,hash(+),intl,json(+),mysql?,pdo,posix,post
 	app-misc/mosquitto
 	www-apps/gitea
 	net-firewall/ufw
-	app-containers/docker
-	app-containers/docker-cli"
+"
