@@ -7,8 +7,6 @@ KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~loong ~m68k ~mips ppc ppc64 ~riscv 
 RDEPEND="
 	app-admin/sudo
 	net-dns/unbound
-	net-misc/chrony
-	net-misc/networkmanager
 	net-vpn/openvpn
 	app-misc/mosquitto[websockets(+)]
 	net-analyzer/zabbix[agent,-server,-frontend,-mysql]
@@ -21,4 +19,5 @@ RDEPEND="
 	sys-apps/usbutils
 	net-firewall/ufw
 	app-arch/unzip
+	virtual/system_meta
 "
