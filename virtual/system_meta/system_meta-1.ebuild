@@ -7,7 +7,7 @@ DESCRIPTION=""
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
-IUSE=""
+IUSE="kernel"
 REQUIRED_USE=""
 
 RDEPEND="app-editors/nano
@@ -18,7 +18,8 @@ RDEPEND="app-editors/nano
 	net-fs/nfs-utils
 	net-misc/chrony
 	net-misc/networkmanager
-	sys-kernel/genkernel
+	kernel? ( sys-kernel/genkernel )
 	sys-process/htop
 	sys-process/iotop
-	virtual/linux-sources"
+	kernel? ( virtual/linux-sources )
+"
