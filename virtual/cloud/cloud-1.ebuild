@@ -15,7 +15,6 @@ RDEPEND="dev-lang/php[curl?,filter,gd,hash(+),intl,json(+),mysql?,pdo,posix,post
         virtual/httpd-php
 	media-libs/vips
 	media-libs/exiftool
-	dev-php/pdlib
 	app-admin/sudo
 	www-apps/gitea
 	net-firewall/ufw
